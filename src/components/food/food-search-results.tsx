@@ -16,11 +16,7 @@ export function FoodSearchResults({ results, onSelect, sonotaFood }: FoodSearchR
 
   return (
     <div className="mt-3">
-      {filteredResults.length === 0 ? (
-        <p className="py-8 text-center text-sm text-text-muted">
-          ごはんが見つかりませんでした
-        </p>
-      ) : (
+      {filteredResults.length > 0 && (
         <ul className="divide-y divide-text-muted/10">
           {filteredResults.map((food) => (
             <li key={food.id}>
@@ -55,7 +51,6 @@ export function FoodSearchResults({ results, onSelect, sonotaFood }: FoodSearchR
             className="flex w-full items-center gap-3 px-2 py-3 text-left text-text-muted transition-colors hover:bg-text-muted/5 active:bg-text-muted/10"
           >
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-text-muted">上記にない場合</p>
               <p className="font-medium">その他のごはん</p>
             </div>
           </button>

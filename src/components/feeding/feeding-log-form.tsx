@@ -88,6 +88,7 @@ export function FeedingLogForm({ cats, defaultCatId, templateDefaults, editLog }
   const [isSearching, setIsSearching] = useState(false)
   const [showFoodSearch, setShowFoodSearch] = useState(!templateDefaults && !editLog)
   const [sonotaFood, setSonotaFood] = useState<Food | null>(null)
+  const [hasSearched, setHasSearched] = useState(false)
 
   // Fetch the その他 food entry on mount
   useEffect(() => {
@@ -99,12 +100,14 @@ export function FeedingLogForm({ cats, defaultCatId, templateDefaults, editLog }
   const handleFoodSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
       setFoodResults([])
+      setHasSearched(false)
       return
     }
     setIsSearching(true)
     try {
       const results = await searchFoods(query)
       setFoodResults(results)
+      setHasSearched(true)
     } catch {
       // silently handle
     } finally {
@@ -206,13 +209,11 @@ export function FeedingLogForm({ cats, defaultCatId, templateDefaults, editLog }
           showFoodSearch && (
             <div>
               <FoodSearchBar onSearch={handleFoodSearch} isLoading={isSearching} />
-              {(foodResults.length > 0 || sonotaFood) && (
-                <FoodSearchResults
-                  results={foodResults}
-                  onSelect={handleFoodSelect}
-                  sonotaFood={foodResults.length > 0 ? sonotaFood : null}
-                />
-              )}
+              <FoodSearchResults
+                results={foodResults}
+                onSelect={handleFoodSelect}
+                sonotaFood={hasSearched ? sonotaFood : null}
+              />
             </div>
           )
         )}

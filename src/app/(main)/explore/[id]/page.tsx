@@ -121,9 +121,20 @@ export default async function ExploreFoodDetailPage({
           </h2>
 
           {stats.totalRecords === 0 ? (
-            <p className="text-sm text-text-muted py-4 text-center">
-              まだ記録がありません
-            </p>
+            <div className="py-6 text-center space-y-3">
+              <p className="text-sm text-text-muted">
+                まだ記録がありません
+              </p>
+              <p className="text-xs text-text-muted">
+                このごはんをあげたことがある方は、ぜひ記録してみてください
+              </p>
+              <a
+                href="/log"
+                className="inline-block rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white"
+              >
+                ごはんを記録する
+              </a>
+            </div>
           ) : (
             <>
               <div className="mb-3 flex gap-4">

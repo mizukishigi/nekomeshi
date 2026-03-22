@@ -5,14 +5,13 @@ import { getLatestLogForTemplate } from '@/actions/feeding-logs'
 import { getFood } from '@/actions/foods'
 import { FeedingLogForm } from '@/components/feeding/feeding-log-form'
 import { TemplateButton } from '@/components/feeding/template-button'
-import { CatSwitcher } from '@/components/cat/cat-switcher'
 import { redirect } from 'next/navigation'
 import { CatSittingIcon } from '@/components/ui/icons'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 interface LogPageProps {
-  searchParams: Promise<{ template?: string; cat_id?: string }>
+  searchParams: Promise<{ template?: string; cat_id?: string; cat?: string }>
 }
 
 export default async function LogPage({ searchParams }: LogPageProps) {
@@ -53,7 +52,7 @@ export default async function LogPage({ searchParams }: LogPageProps) {
 
   const params = await searchParams
   const isTemplate = params.template === 'true'
-  const defaultCatId = params.cat_id || cats[0].id
+  const defaultCatId = params.cat || params.cat_id || cats[0].id
   const template = await getLatestLogForTemplate(defaultCatId)
 
   // If template=true, load the food details for pre-filling
@@ -80,9 +79,6 @@ export default async function LogPage({ searchParams }: LogPageProps) {
   return (
     <>
       <main className="px-4 py-4 space-y-4">
-        {/* Cat switcher */}
-        <CatSwitcher cats={cats} selectedCatId={defaultCatId} />
-
         {/* Template button */}
         <TemplateButton catId={defaultCatId} template={template} />
 
