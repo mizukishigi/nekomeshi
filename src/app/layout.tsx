@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     description: '愛猫のごはんを記録して、みんなの記録からうちの子に合うフードを探そう。',
     images: [
       {
-        url: '/icon.png',
+        url: '/ogp-icon.png',
         width: 512,
         height: 512,
         alt: 'ねこ飯',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary',
     title: 'ねこ飯 - 猫のごはん記録',
     description: '愛猫のごはんを記録して、みんなの記録からうちの子に合うフードを探そう。',
-    images: ['/icon.png'],
+    images: ['/ogp-icon.png'],
   },
   other: {
     'theme-color': '#F97316',
