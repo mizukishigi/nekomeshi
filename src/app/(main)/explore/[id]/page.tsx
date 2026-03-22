@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Header } from '@/components/layout/header'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { PawIcon } from '@/components/ui/icons'
@@ -83,7 +82,6 @@ export default async function ExploreFoodDetailPage({
           }),
         }}
       />
-      <Header title="ごはん詳細" />
       <main className="px-4 py-4 space-y-4">
         {/* Food info card */}
         <Card>

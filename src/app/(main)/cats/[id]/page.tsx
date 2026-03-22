@@ -1,5 +1,4 @@
 import { getCat } from '@/actions/cats'
-import { Header } from '@/components/layout/header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar } from '@/components/ui/avatar'
 import Link from 'next/link'
@@ -36,9 +35,7 @@ export default async function CatProfilePage({
   }
 
   return (
-    <>
-      <Header title={cat.name} />
-      <main className="px-4 py-4 space-y-4">
+    <main className="px-4 py-4 space-y-4">
         <div className="flex flex-col items-center gap-3">
           <Avatar
             src={cat.photo_url}
@@ -91,6 +88,5 @@ export default async function CatProfilePage({
           編集
         </Link>
       </main>
-    </>
   )
 }

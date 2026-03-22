@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { Header } from '@/components/layout/header'
 import { FoodSearchBar } from '@/components/food/food-search-bar'
 import { FoodSearchResults } from '@/components/food/food-search-results'
 import { searchFoods } from '@/actions/foods'
@@ -31,14 +30,11 @@ export default function FoodSearchPage() {
   }, [])
 
   return (
-    <>
-      <Header title="ごはん検索" />
-      <main className="px-4 py-4">
-        <FoodSearchBar onSearch={handleSearch} isLoading={isLoading} />
-        {hasSearched && (
-          <FoodSearchResults results={results} onSelect={handleSelect} />
-        )}
-      </main>
-    </>
+    <main className="px-4 py-4">
+      <FoodSearchBar onSearch={handleSearch} isLoading={isLoading} />
+      {hasSearched && (
+        <FoodSearchResults results={results} onSelect={handleSelect} />
+      )}
+    </main>
   )
 }

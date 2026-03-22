@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getCats } from '@/actions/cats'
 import { getFeedingLog } from '@/actions/feeding-logs'
-import { Header } from '@/components/layout/header'
 import { FeedingLogForm } from '@/components/feeding/feeding-log-form'
 import { redirect } from 'next/navigation'
 import { notFound } from 'next/navigation'
@@ -34,15 +33,12 @@ export default async function FeedingLogEditPage({
   }
 
   return (
-    <>
-      <Header title="記録を編集" />
-      <main className="px-4 py-4">
-        <FeedingLogForm
-          cats={cats}
-          defaultCatId={log.cat_id}
-          editLog={log}
-        />
-      </main>
-    </>
+    <main className="px-4 py-4">
+      <FeedingLogForm
+        cats={cats}
+        defaultCatId={log.cat_id}
+        editLog={log}
+      />
+    </main>
   )
 }

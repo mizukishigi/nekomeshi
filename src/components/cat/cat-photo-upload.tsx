@@ -105,7 +105,6 @@ export function CatPhotoUpload({ currentUrl, catId, onChange }: CatPhotoUploadPr
         ref={inputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         onChange={handleFileChange}
         className="hidden"
       />

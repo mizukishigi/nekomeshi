@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Header } from '@/components/layout/header'
 import { createClient } from '@/lib/supabase/server'
 import { getCats } from '@/actions/cats'
 import { getLatestLogForTemplate } from '@/actions/feeding-logs'
@@ -80,7 +79,6 @@ export default async function LogPage({ searchParams }: LogPageProps) {
 
   return (
     <>
-      <Header title="ごはんを記録" />
       <main className="px-4 py-4 space-y-4">
         {/* Cat switcher */}
         <CatSwitcher cats={cats} selectedCatId={defaultCatId} />
