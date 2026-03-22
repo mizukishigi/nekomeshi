@@ -53,17 +53,17 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9035248866943401"
+          crossOrigin="anonymous"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
       </head>
       <body className="font-sans antialiased">
-        <Script
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9035248866943401"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3MCXYLLME2"
           strategy="afterInteractive"
