@@ -25,11 +25,20 @@ export const metadata: Metadata = {
     siteName: 'ねこ飯',
     title: 'ねこ飯 - 猫のごはん記録',
     description: '愛猫のごはんを記録して、みんなの記録からうちの子に合うフードを探そう。',
+    images: [
+      {
+        url: '/icon.png',
+        width: 512,
+        height: 512,
+        alt: 'ねこ飯',
+      },
+    ],
   },
   twitter: {
     card: 'summary',
     title: 'ねこ飯 - 猫のごはん記録',
     description: '愛猫のごはんを記録して、みんなの記録からうちの子に合うフードを探そう。',
+    images: ['/icon.png'],
   },
   other: {
     'theme-color': '#F97316',
