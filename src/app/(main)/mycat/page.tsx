@@ -135,11 +135,24 @@ export default async function MyCatPage({
           </Card>
         ) : (
           <>
-            {/* Cat switcher */}
-            <CatSwitcher cats={cats} selectedCatId={selectedCatId} />
+            {/* Cat switcher + edit link */}
+            <div className="flex items-end justify-between">
+              <div className="flex-1 min-w-0">
+                <CatSwitcher cats={cats} selectedCatId={selectedCatId} />
+              </div>
+              {selectedCatId && (
+                <Link
+                  href={`/cats/${selectedCatId}/edit`}
+                  className="text-xs text-primary hover:underline shrink-0 pb-1"
+                >
+                  プロフィール編集
+                </Link>
+              )}
+            </div>
 
-            {/* Date picker + day summary */}
+            {/* ごはんの記録 section */}
             <section className="space-y-3">
+              <h2 className="text-lg font-bold text-text">ごはんの記録</h2>
               <DatePicker currentDate={selectedDate} />
 
               {/* Day total card */}
@@ -160,8 +173,6 @@ export default async function MyCatPage({
                   </div>
                 </CardContent>
               </Card>
-
-              <h2 className="text-sm font-bold text-text">ごはんの記録</h2>
               {dayLogs.length > 0 ? (
                 dayLogs.map((log) => (
                   <FeedingLogCard key={log.id} log={log} />
@@ -176,7 +187,7 @@ export default async function MyCatPage({
             {/* All-time food summary */}
             {foodSummary.length > 0 && (
               <section className="space-y-3">
-                <h2 className="text-sm font-bold text-text">今までのごはん</h2>
+                <h2 className="text-lg font-bold text-text">ごはんまとめ</h2>
                 {foodSummary.map((food) => {
                   const avgAppetite = food.appetite_count > 0
                     ? food.appetite_sum / food.appetite_count
