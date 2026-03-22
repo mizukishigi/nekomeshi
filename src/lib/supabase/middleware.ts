@@ -55,7 +55,9 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/explore') &&
     !request.nextUrl.pathname.startsWith('/auth/callback') &&
     !request.nextUrl.pathname.startsWith('/privacy') &&
-    !request.nextUrl.pathname.startsWith('/terms')
+    !request.nextUrl.pathname.startsWith('/terms') &&
+    !request.nextUrl.pathname.startsWith('/sitemap') &&
+    !request.nextUrl.pathname.startsWith('/robots')
   ) {
     const url = request.nextUrl.clone()
     const redirectTo = request.nextUrl.pathname
