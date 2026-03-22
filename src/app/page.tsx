@@ -10,6 +10,18 @@ export const metadata: Metadata = {
     title: 'ねこ飯 — 猫のごはん記録・フード検索',
     description: 'みんなの記録から、うちの子に合うごはんを探そう',
     type: 'website',
+    images: [
+      {
+        url: '/ogp-icon.png',
+        width: 512,
+        height: 512,
+        alt: 'ねこ飯',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary',
+    images: ['/ogp-icon.png'],
   },
 }
 
