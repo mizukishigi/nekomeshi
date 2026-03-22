@@ -13,13 +13,3 @@ variable "gcp_region" {
   default     = "asia-northeast1"
 }
 
-variable "support_email" {
-  description = "OAuth 同意画面に表示するサポートメールアドレス"
-  type        = string
-}
-
-variable "application_title" {
-  description = "OAuth 同意画面に表示するアプリケーション名"
-  type        = string
-  default     = "nekomeshi"
-}

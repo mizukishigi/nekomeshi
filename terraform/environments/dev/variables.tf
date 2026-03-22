@@ -14,11 +14,6 @@ variable "gcp_region" {
   default     = "asia-northeast1"
 }
 
-variable "support_email" {
-  description = "OAuth 同意画面のサポートメールアドレス"
-  type        = string
-}
-
 # --- Supabase ---
 variable "supabase_project_ref" {
   description = "Supabase プロジェクトのリファレンスID"

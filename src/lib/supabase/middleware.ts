@@ -49,10 +49,13 @@ export async function updateSession(request: NextRequest) {
   // 未ログインユーザーを /login にリダイレクト（元のURLを保存）
   if (
     !user &&
+    request.nextUrl.pathname !== '/' &&
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/signup') &&
     !request.nextUrl.pathname.startsWith('/explore') &&
-    !request.nextUrl.pathname.startsWith('/auth/callback')
+    !request.nextUrl.pathname.startsWith('/auth/callback') &&
+    !request.nextUrl.pathname.startsWith('/privacy') &&
+    !request.nextUrl.pathname.startsWith('/terms')
   ) {
     const url = request.nextUrl.clone()
     const redirectTo = request.nextUrl.pathname

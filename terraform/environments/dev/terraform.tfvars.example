@@ -7,8 +7,6 @@
 # GCP
 gcp_project_id = "dev-nekomeshi"
 gcp_region     = "asia-northeast1"
-support_email  = ""  # OAuth 同意画面に表示するメールアドレス
-
 # Supabase
 supabase_project_ref  = "pzjaxynuzudqhuitfkff"
 supabase_access_token = ""  # https://supabase.com/dashboard/account/tokens で生成

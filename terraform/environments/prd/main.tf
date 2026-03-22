@@ -44,10 +44,8 @@ provider "supabase" {
 module "gcp_oauth" {
   source = "../../modules/gcp-oauth"
 
-  gcp_project_id    = var.gcp_project_id
-  gcp_region        = var.gcp_region
-  support_email     = var.support_email
-  application_title = "nekomeshi"
+  gcp_project_id = var.gcp_project_id
+  gcp_region     = var.gcp_region
 }
 
 # ----------------------------------------------------------------------------
