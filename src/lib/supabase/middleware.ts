@@ -33,6 +33,20 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // ログイン済みユーザーが認証ページにアクセスしたら元のページ or /explore にリダイレクト
+  if (
+    user &&
+    (request.nextUrl.pathname.startsWith('/login') ||
+     request.nextUrl.pathname.startsWith('/signup'))
+  ) {
+    const url = request.nextUrl.clone()
+    const redirectTo = request.nextUrl.searchParams.get('redirect') || '/explore'
+    url.pathname = redirectTo
+    url.searchParams.delete('redirect')
+    return NextResponse.redirect(url)
+  }
+
+  // 未ログインユーザーを /login にリダイレクト（元のURLを保存）
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
@@ -41,7 +55,9 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/auth/callback')
   ) {
     const url = request.nextUrl.clone()
+    const redirectTo = request.nextUrl.pathname
     url.pathname = '/login'
+    if (redirectTo !== '/') url.searchParams.set('redirect', redirectTo)
     return NextResponse.redirect(url)
   }
 

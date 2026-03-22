@@ -4,11 +4,14 @@ import { login } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useActionState, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 function GoogleButton() {
   const [isLoading, setIsLoading] = useState(false)
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/explore'
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)
@@ -16,7 +19,7 @@ function GoogleButton() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
       },
     })
   }
@@ -40,6 +43,8 @@ function GoogleButton() {
 }
 
 export function LoginForm() {
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/explore'
   const [state, formAction, isPending] = useActionState(
     async (_prevState: { error: string } | null, formData: FormData) => {
       const result = await login(formData)
@@ -59,6 +64,7 @@ export function LoginForm() {
       </div>
 
       <form action={formAction} className="space-y-4">
+        <input type="hidden" name="redirect" value={redirectTo} />
         <Input
           id="email"
           name="email"
