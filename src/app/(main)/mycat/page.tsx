@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getCats } from '@/actions/cats'
+import { ScrollToTop } from '@/components/layout/scroll-to-top'
 import { getLogsByDateRange, getRecentLogs } from '@/actions/feeding-logs'
 import { CatSwitcher } from '@/components/cat/cat-switcher'
 import { FeedingLogCard } from '@/components/feeding/feeding-log-card'
@@ -115,6 +116,7 @@ export default async function MyCatPage({
 
   return (
     <>
+      <ScrollToTop />
       <main className="px-4 py-4 space-y-5 pb-24">
         {cats.length === 0 ? (
           <Card className="p-8 text-center">

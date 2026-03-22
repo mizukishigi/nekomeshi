@@ -183,7 +183,7 @@ export function FeedingLogForm({ cats, defaultCatId, templateDefaults, editLog }
 
       {/* Food selector */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-text">ごはん</label>
+        <label className="mb-1.5 block text-sm font-medium text-text">ごはん <span className="text-error">*</span></label>
         {selectedFood ? (
           <div className="flex items-center gap-3 rounded-xl border border-primary bg-primary/5 px-4 py-3">
             <div className="min-w-0 flex-1">
@@ -295,7 +295,7 @@ export function FeedingLogForm({ cats, defaultCatId, templateDefaults, editLog }
         size="lg"
         className="w-full"
         isLoading={isPending}
-        disabled={!selectedFood || !amount}
+        disabled={!selectedFood || !amount || appetiteRating === null}
       >
         {isEditMode ? '更新する' : '記録する'}
       </Button>

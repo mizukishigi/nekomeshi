@@ -1,9 +1,13 @@
+'use client'
+
 import Link from 'next/link'
+import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { APPETITE_LABELS, STOOL_LABELS, FOOD_TYPE_LABELS } from '@/lib/constants'
 import { formatTime } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { PawIcon } from '@/components/ui/icons'
+import { deleteFeedingLog } from '@/actions/feeding-logs'
 import type { FeedingLogWithFood } from '@/actions/feeding-logs'
 
 interface FeedingLogCardProps {
@@ -11,8 +15,16 @@ interface FeedingLogCardProps {
 }
 
 export function FeedingLogCard({ log }: FeedingLogCardProps) {
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    if (!confirm('この記録を削除しますか？')) return
+    setIsDeleting(true)
+    await deleteFeedingLog(log.id)
+  }
+
   return (
-    <Card className="flex gap-3">
+    <Card className={`flex gap-3 ${isDeleting ? 'opacity-50' : ''}`}>
       {/* Time column */}
       <div className="shrink-0 pt-0.5">
         <span className="text-lg font-bold text-primary">
@@ -23,7 +35,7 @@ export function FeedingLogCard({ log }: FeedingLogCardProps) {
       {/* Content */}
       <div className="min-w-0 flex-1 space-y-1.5">
         {/* Food info */}
-        <div className="flex items-start gap-2">
+        <div className="flex items-center gap-2">
           <div className="min-w-0 flex-1">
             <p className="text-xs text-text-muted">{log.foods.brand}</p>
             <p className="truncate font-medium text-text">{log.foods.product_name}</p>
@@ -33,7 +45,8 @@ export function FeedingLogCard({ log }: FeedingLogCardProps) {
           </Badge>
           <Link
             href={`/log/${log.id}/edit`}
-            className="shrink-0 rounded-lg p-1 text-text-muted hover:bg-text-muted/10 transition-colors"
+            className="shrink-0 rounded-lg p-1 text-text-muted hover:bg-primary/15 hover:text-primary active:bg-primary/25 transition-colors"
+            style={{ minHeight: 0 }}
             aria-label="編集"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -41,6 +54,20 @@ export function FeedingLogCard({ log }: FeedingLogCardProps) {
               <path d="m15 5 4 4" />
             </svg>
           </Link>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="shrink-0 rounded-lg p-1 text-text-muted hover:bg-error/15 hover:text-error active:bg-error/25 transition-colors"
+            style={{ minHeight: 0 }}
+            aria-label="削除"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18" />
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            </svg>
+          </button>
         </div>
 
         {/* Amount */}

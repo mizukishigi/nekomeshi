@@ -37,7 +37,7 @@ export function AmountPresets({ value, onChange }: AmountPresetsProps) {
 
   return (
     <div className="w-full">
-      <label className="mb-1.5 block text-sm font-medium text-text">量 (g)</label>
+      <label className="mb-1.5 block text-sm font-medium text-text">量 (g) <span className="text-error">*</span></label>
       <div className="flex gap-2 mb-2">
         {AMOUNT_PRESETS.map((preset) => (
           <button

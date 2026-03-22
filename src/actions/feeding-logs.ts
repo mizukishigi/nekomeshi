@@ -48,7 +48,7 @@ export async function createFeedingLog(
     : memoRaw
 
   if (!cat_id || !food_id) {
-    return { error: '猫とフードを選択してください' }
+    return { error: '猫とごはんを選択してください' }
   }
 
   const amount_g = parseFloat(amount_g_str)
@@ -57,6 +57,9 @@ export async function createFeedingLog(
   }
 
   const appetite_rating = appetite_rating_str ? parseInt(appetite_rating_str) : null
+  if (appetite_rating === null) {
+    return { error: '食欲を選択してください' }
+  }
   const stool_condition = stool_condition_str ? parseInt(stool_condition_str) : null
 
   const { error } = await supabase.from('feeding_logs').insert({
@@ -74,10 +77,9 @@ export async function createFeedingLog(
     return { error: '記録の保存に失敗しました' }
   }
 
-  revalidatePath('/')
+  revalidatePath('/mycat')
   revalidatePath('/log')
-  revalidatePath('/timeline')
-  redirect('/')
+  redirect('/mycat')
 }
 
 export async function getFeedingLog(logId: string): Promise<FeedingLogWithFood | null> {
@@ -338,7 +340,39 @@ export async function createFromTemplate(catId: string) {
     return { error: '記録の保存に失敗しました' }
   }
 
-  revalidatePath('/')
+  revalidatePath('/mycat')
   revalidatePath('/log')
   return { error: '', success: true }
+}
+
+export async function deleteFeedingLog(logId: string) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: '認証されていません' }
+  }
+
+  // Verify ownership via cat
+  const { data: log } = await supabase
+    .from('feeding_logs')
+    .select('id, cat_id, cats!inner(profile_id)')
+    .eq('id', logId)
+    .single()
+
+  if (!log || (log as any).cats?.profile_id !== user.id) {
+    return { error: '削除権限がありません' }
+  }
+
+  const { error } = await supabase
+    .from('feeding_logs')
+    .delete()
+    .eq('id', logId)
+
+  if (error) {
+    return { error: '削除に失敗しました' }
+  }
+
+  revalidatePath('/mycat')
+  redirect('/mycat')
 }

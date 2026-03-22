@@ -17,7 +17,7 @@ export function AppetiteRating({ value, onChange }: AppetiteRatingProps) {
 
   return (
     <div className="w-full">
-      <label className="mb-1.5 block text-sm font-medium text-text">食欲</label>
+      <label className="mb-1.5 block text-sm font-medium text-text">食欲 <span className="text-error">*</span></label>
       <div className="flex justify-center gap-3">
         {[1, 2, 3, 4, 5].map((rating) => (
           <button
