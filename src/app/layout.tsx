@@ -60,6 +60,11 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9035248866943401"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+        <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3MCXYLLME2"
           strategy="afterInteractive"
         />
