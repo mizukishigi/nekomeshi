@@ -1,0 +1,1486 @@
+[
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "インドア 成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 375
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "キトン 子猫用",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 406
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "エイジング12+ 高齢猫用",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 363
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "フィット 適正体重の成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 381
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "センシブル 胃腸が敏感な成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 388
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "オーラル ケア 歯の健康が気になる成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 391
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "ヘアー&スキン ケア 被毛の健康が気になる成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 395
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "ステアライズド 適正体重の維持が難しい成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 342
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "インドア 7+ 室内で生活する中高齢猫用",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "ユリナリー ケア 健康な尿を維持したい成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 374
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "マザー&ベビーキャット 母猫・子猫用",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 414
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "アペタイト コントロール おねだりの多い成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 345
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "インドア 成猫用 ウェット ローフ",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 92
+  },
+  {
+    "brand": "ロイヤルカナン",
+    "product_name": "キトン ウェット ローフ 子猫用",
+    "type": "wet",
+    "target_age": "kitten",
+    "calories_per_100g": 100
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "室内飼い猫用 インドアキャット ターキー&チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "美味を求める成猫用 チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 370
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "子ねこ用 チキン",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 400
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "優しく腎臓の健康サポート 11歳以上 チキン",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "メタボリック エネルギーコントロール ターキー",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 340
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "下部尿路の健康維持 F.L.U.T.H.ケア チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "避妊・去勢した猫の体重ケア ターキー",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 335
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "グレインフリー 白身魚",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 375
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "避妊・去勢した猫の体重ケア",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 340
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "メタボリックエネルギーコントロール",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 335
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "パウチ 成猫用 チキン グレービー仕立て",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 75
+  },
+  {
+    "brand": "ピュリナワン",
+    "product_name": "パウチ 子ねこ用 チキン グレービー仕立て",
+    "type": "wet",
+    "target_age": "kitten",
+    "calories_per_100g": 85
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "インドアキャット アダルト チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 363
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "キトン チキン 子猫用",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 410
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "シニア チキン 7歳以上",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 358
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "シニアプラス チキン 11歳以上",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 371
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "アダルト まぐろ",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 368
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "アダルト ライト チキン 肥満傾向の成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 331
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "避妊・去勢猫用 まぐろ",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 344
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "アダルト 缶 チキン",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 85
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "キトン 缶 レバー&チキン 子猫用",
+    "type": "wet",
+    "target_age": "kitten",
+    "calories_per_100g": 90
+  },
+  {
+    "brand": "ヒルズ サイエンスダイエット",
+    "product_name": "シニア 缶 チキン 7歳以上",
+    "type": "wet",
+    "target_age": "senior",
+    "calories_per_100g": 78
+  },
+  {
+    "brand": "ニュートロ ナチュラルチョイス",
+    "product_name": "室内猫用 アダルト チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 370
+  },
+  {
+    "brand": "ニュートロ ナチュラルチョイス",
+    "product_name": "室内猫用 キトン チキン",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 390
+  },
+  {
+    "brand": "ニュートロ ナチュラルチョイス",
+    "product_name": "室内猫用 アダルト サーモン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "ニュートロ ナチュラルチョイス",
+    "product_name": "穀物フリー アダルト ダック",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 380
+  },
+  {
+    "brand": "ニュートロ ナチュラルチョイス",
+    "product_name": "室内猫用 シニア チキン",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "ニュートロ ナチュラルチョイス",
+    "product_name": "食にこだわる猫用 アダルト チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 375
+  },
+  {
+    "brand": "ニュートロ ナチュラルチョイス",
+    "product_name": "室内猫用 アダルト ターキー",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 368
+  },
+  {
+    "brand": "ニュートロ ナチュラルチョイス",
+    "product_name": "穀物フリー アダルト サーモン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 378
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "ゴールド缶 極上まぐろ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 48
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "ゴールド缶 極上かつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 50
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "ゴールド缶 極上ささみ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 45
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "プチリュクス パウチ まぐろのささみ添え",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 55
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "プチリュクス パウチ かつおのしらす添え",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 52
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "プチリュクス パウチ まぐろとたい",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 50
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "缶 あらほぐし仕立て ロースト牛肉",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 78
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "缶 あらほぐし仕立て まぐろのグリル",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 60
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "ボックス 4つのうれしい贅沢バラエティ",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 370
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "ナチュラル グレインフリー 白身魚の贅沢",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "クリスピーキッス チーズ&チキンセレクト",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 390
+  },
+  {
+    "brand": "モンプチ",
+    "product_name": "クリスピーキッス シーフードセレクト",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 385
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る まぐろ",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 7
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る とりささみ",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 7
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る かつお",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 7
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る 総合栄養食 まぐろ",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 10
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る 総合栄養食 とりささみ",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 10
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る 水分補給 まぐろ",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 5
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る 11歳からの まぐろ",
+    "type": "treat",
+    "target_age": "senior",
+    "calories_per_100g": 7
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る 子ねこ用 まぐろ",
+    "type": "treat",
+    "target_age": "kitten",
+    "calories_per_100g": 8
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "缶 まぐろ&とりささみ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 45
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "缶 とりささみ&甘えび",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 42
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "パウチ まぐろ ささみ入り ほたて味",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 40
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "パウチ とりささみ かつお節味",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 38
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "焼かつお 本格かつお味",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 50
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る グルメ 本格かつおだし",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 7
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "缶 かつお&おかか(かつお節)",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 48
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る 毛玉配慮 まぐろ",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 7
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "ちゅ〜る 下部尿路配慮 まぐろ",
+    "type": "treat",
+    "target_age": "adult",
+    "calories_per_100g": 7
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "焼かつお 本格ほたて味",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 48
+  },
+  {
+    "brand": "チャオ",
+    "product_name": "焼ささみ 本格かつお節味",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 45
+  },
+  {
+    "brand": "いなば",
+    "product_name": "金のだし カップ まぐろ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 55
+  },
+  {
+    "brand": "いなば",
+    "product_name": "金のだし カップ かつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 52
+  },
+  {
+    "brand": "いなば",
+    "product_name": "とびつく ささみ",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 12
+  },
+  {
+    "brand": "いなば",
+    "product_name": "焼ささみ 5本入り",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 55
+  },
+  {
+    "brand": "いなば",
+    "product_name": "まぐろの贅沢パウチ まぐろ細切り",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 42
+  },
+  {
+    "brand": "いなば",
+    "product_name": "贅沢 まぐろまるごとフレーク",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 58
+  },
+  {
+    "brand": "いなば",
+    "product_name": "前浜の魚 かつお丸つぶし",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 65
+  },
+  {
+    "brand": "いなば",
+    "product_name": "低脂肪 とりささみ&温野菜",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 35
+  },
+  {
+    "brand": "カルカン",
+    "product_name": "ドライ かつおと野菜味 ミックス",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "カルカン",
+    "product_name": "ドライ まぐろと野菜味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "カルカン",
+    "product_name": "ドライ 子ねこ用 かつおと野菜味ミルク粒入り",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 385
+  },
+  {
+    "brand": "カルカン",
+    "product_name": "ドライ 15歳から用 かつおと野菜味",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 340
+  },
+  {
+    "brand": "カルカン",
+    "product_name": "パウチ まぐろ",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 52
+  },
+  {
+    "brand": "カルカン",
+    "product_name": "パウチ お魚ミックス まぐろ・かつお・たい入り",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 55
+  },
+  {
+    "brand": "カルカン",
+    "product_name": "パウチ まぐろ 子ねこ用",
+    "type": "wet",
+    "target_age": "kitten",
+    "calories_per_100g": 60
+  },
+  {
+    "brand": "カルカン",
+    "product_name": "パウチ ささみ入りまぐろ 15歳から用",
+    "type": "wet",
+    "target_age": "senior",
+    "calories_per_100g": 48
+  },
+  {
+    "brand": "銀のスプーン",
+    "product_name": "贅沢うまみ仕立て お魚づくし",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "銀のスプーン",
+    "product_name": "贅沢うまみ仕立て 10歳頃から お魚づくし",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "銀のスプーン",
+    "product_name": "パウチ まぐろ",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 50
+  },
+  {
+    "brand": "銀のスプーン",
+    "product_name": "パウチ ささみ入りまぐろ 13歳頃から",
+    "type": "wet",
+    "target_age": "senior",
+    "calories_per_100g": 45
+  },
+  {
+    "brand": "銀のスプーン",
+    "product_name": "まぐろ・かつお・白身魚味",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 370
+  },
+  {
+    "brand": "銀のスプーン",
+    "product_name": "贅沢うまみ仕立て 食事の吐き戻し軽減フード",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "銀のスプーン",
+    "product_name": "三ツ星グルメ パウチ まぐろ入りかつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 48
+  },
+  {
+    "brand": "銀のスプーン",
+    "product_name": "パウチ ささみ",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 50
+  },
+  {
+    "brand": "銀のスプーン",
+    "product_name": "おやつ しあわせスナック まぐろ味",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "シーバ",
+    "product_name": "デュオ 鶏ささみ味と海のセレクション",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 375
+  },
+  {
+    "brand": "シーバ",
+    "product_name": "デュオ 魚介とお肉のチーズ味セレクション",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 380
+  },
+  {
+    "brand": "シーバ",
+    "product_name": "デュオ 15歳以上 鶏ささみ味と海のセレクション",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "シーバ",
+    "product_name": "アミューズ お魚の贅沢スープ まぐろ、かつお節添え",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 15
+  },
+  {
+    "brand": "シーバ",
+    "product_name": "リッチ ごちそうフレーク まぐろ味",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 60
+  },
+  {
+    "brand": "シーバ",
+    "product_name": "リッチ ごちそうフレーク 鶏ささみ味",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 58
+  },
+  {
+    "brand": "シーバ",
+    "product_name": "とろ〜りメルティ まぐろ味",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 8
+  },
+  {
+    "brand": "シーバ",
+    "product_name": "とろ〜りメルティ かつお味",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 8
+  },
+  {
+    "brand": "アイムス",
+    "product_name": "成猫用 体重管理用 まぐろ味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 345
+  },
+  {
+    "brand": "アイムス",
+    "product_name": "成猫用 インドアキャット チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "アイムス",
+    "product_name": "子猫用 チキン",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 395
+  },
+  {
+    "brand": "アイムス",
+    "product_name": "7歳以上用 インドアキャット チキン",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "メディファス",
+    "product_name": "室内猫 毛玉ケアプラス 1歳から チキン&フィッシュ味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "メディファス",
+    "product_name": "子ねこ 12か月まで チキン味",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 390
+  },
+  {
+    "brand": "メディファス",
+    "product_name": "避妊・去勢後のケア チキン&フィッシュ味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 340
+  },
+  {
+    "brand": "メディファス",
+    "product_name": "7歳から チキン&フィッシュ味",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "ファーストチョイス",
+    "product_name": "成猫 1歳以上 室内猫用 サーモン&白身魚",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "ファーストチョイス",
+    "product_name": "成猫 1歳以上 室内猫用 チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "ファーストチョイス",
+    "product_name": "子ねこ 2か月から1歳まで チキン",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 400
+  },
+  {
+    "brand": "ファーストチョイス",
+    "product_name": "高齢猫 10歳以上 室内猫用 チキン",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 345
+  },
+  {
+    "brand": "ファーストチョイス",
+    "product_name": "成猫 1歳以上 下部尿路の健康維持 チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "ファーストチョイス",
+    "product_name": "成猫 1歳以上 体重が気になる猫用 チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 340
+  },
+  {
+    "brand": "ジェーピースタイル",
+    "product_name": "和の究み 1歳から 飽きやすい成猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "ジェーピースタイル",
+    "product_name": "和の究み 子ねこ用",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 395
+  },
+  {
+    "brand": "ジェーピースタイル",
+    "product_name": "和の究み 11歳以上のシニア猫用",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "ジェーピースタイル",
+    "product_name": "和の究み 1歳から 下部尿路の健康維持サポート",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "ジェーピースタイル",
+    "product_name": "和の究み 1歳から 避妊・去勢後の猫用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 340
+  },
+  {
+    "brand": "ジェーピースタイル",
+    "product_name": "和の究み 15歳から 長生き猫用",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 345
+  },
+  {
+    "brand": "ピュリナ プロプラン",
+    "product_name": "成猫用 室内飼い猫用 チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 382
+  },
+  {
+    "brand": "ピュリナ プロプラン",
+    "product_name": "子猫用 チキン",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 415
+  },
+  {
+    "brand": "ピュリナ プロプラン",
+    "product_name": "成猫用 サーモン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 385
+  },
+  {
+    "brand": "ピュリナ プロプラン",
+    "product_name": "7歳以上 室内飼い猫用 チキン",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "ピュリナ プロプラン",
+    "product_name": "成猫用 体重管理用 チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 348
+  },
+  {
+    "brand": "ピュリナ プロプラン",
+    "product_name": "成猫用 皮膚・被毛の健康維持 サーモン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 390
+  },
+  {
+    "brand": "ピュリナ プロプラン",
+    "product_name": "成猫用 デリケートなお腹の健康維持 ターキー",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 378
+  },
+  {
+    "brand": "ピュリナ プロプラン",
+    "product_name": "成猫用 尿路の健康維持 チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 375
+  },
+  {
+    "brand": "ウェルネス",
+    "product_name": "コア 室内猫用 骨抜きチキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 388
+  },
+  {
+    "brand": "ウェルネス",
+    "product_name": "コア 子猫用 骨抜きターキー",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 406
+  },
+  {
+    "brand": "ウェルネス",
+    "product_name": "コア 成猫用 オリジナル",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 392
+  },
+  {
+    "brand": "ウェルネス",
+    "product_name": "コア 成猫用 サーモン&ニシン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 395
+  },
+  {
+    "brand": "ウェルネス",
+    "product_name": "コア 室内猫用 缶 チキン&ターキー パテ",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 108
+  },
+  {
+    "brand": "ウェルネス",
+    "product_name": "コア シグネチャーセレクツ フレーク チキン&ターキー",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 65
+  },
+  {
+    "brand": "オリジン",
+    "product_name": "キャット&キトン",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 416
+  },
+  {
+    "brand": "オリジン",
+    "product_name": "6フィッシュキャット",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 410
+  },
+  {
+    "brand": "オリジン",
+    "product_name": "レジオナルレッドキャット",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 414
+  },
+  {
+    "brand": "オリジン",
+    "product_name": "ツンドラキャット",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 412
+  },
+  {
+    "brand": "オリジン",
+    "product_name": "フィット&トリム キャット",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 371
+  },
+  {
+    "brand": "アカナ",
+    "product_name": "ワイルドプレイリーキャット",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 406
+  },
+  {
+    "brand": "アカナ",
+    "product_name": "パシフィカキャット",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 398
+  },
+  {
+    "brand": "アカナ",
+    "product_name": "グラスランドキャット",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 404
+  },
+  {
+    "brand": "アカナ",
+    "product_name": "インドアエントリーキャット",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "アカナ",
+    "product_name": "ホームステッドハーベストキャット",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 396
+  },
+  {
+    "brand": "ナチュラルバランス",
+    "product_name": "ウルトラプレミアム 室内猫用 チキンミール&サーモンミール",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 358
+  },
+  {
+    "brand": "ナチュラルバランス",
+    "product_name": "グリーンピー&ダック キャットフード",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 368
+  },
+  {
+    "brand": "ナチュラルバランス",
+    "product_name": "リデュースカロリー キャットフード",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 340
+  },
+  {
+    "brand": "ナチュラルバランス",
+    "product_name": "ウルトラプレミアム 缶 室内猫用 チキン",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 95
+  },
+  {
+    "brand": "ナチュラルバランス",
+    "product_name": "グリーンピー&チキン キャットフード",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "懐石",
+    "product_name": "2dish 枕崎のかつお節ペア 海のおいしさ",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "懐石",
+    "product_name": "2dish 瀬戸内のちりめんペア お魚づくし",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "懐石",
+    "product_name": "zeppin 5つのごちそう お魚仕立て",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "懐石",
+    "product_name": "2dish 子ねこ用 まぐろペア",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 385
+  },
+  {
+    "brand": "懐石",
+    "product_name": "2dish 15歳以上用 枕崎のかつお節ペア",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 345
+  },
+  {
+    "brand": "懐石",
+    "product_name": "パウチ まぐろ白身のせ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 50
+  },
+  {
+    "brand": "黒缶",
+    "product_name": "まぐろとかつお まぐろ白身のせ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 75
+  },
+  {
+    "brand": "黒缶",
+    "product_name": "まぐろとかつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 78
+  },
+  {
+    "brand": "黒缶",
+    "product_name": "まぐろミックス ささみ入りまぐろとかつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 72
+  },
+  {
+    "brand": "黒缶",
+    "product_name": "毎日 かつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 68
+  },
+  {
+    "brand": "黒缶",
+    "product_name": "パウチ まぐろとかつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 55
+  },
+  {
+    "brand": "金缶",
+    "product_name": "芳醇 まぐろ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 85
+  },
+  {
+    "brand": "金缶",
+    "product_name": "芳醇 かつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 82
+  },
+  {
+    "brand": "金缶",
+    "product_name": "濃厚とろみ まぐろ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 55
+  },
+  {
+    "brand": "金缶",
+    "product_name": "ミニ まぐろ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 75
+  },
+  {
+    "brand": "金缶",
+    "product_name": "ミニ かつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 72
+  },
+  {
+    "brand": "ミャウミャウ",
+    "product_name": "カリカリ小粒タイプ ミドル まぐろ味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "ミャウミャウ",
+    "product_name": "カリカリ小粒タイプ ミドル かつお味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 358
+  },
+  {
+    "brand": "ミャウミャウ",
+    "product_name": "ジューシー まぐろ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 50
+  },
+  {
+    "brand": "ミャウミャウ",
+    "product_name": "ジューシー ささみ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 48
+  },
+  {
+    "brand": "ミャウミャウ",
+    "product_name": "クリーミー まぐろ味",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 8
+  },
+  {
+    "brand": "AllWell",
+    "product_name": "室内猫用 フィッシュ味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "AllWell",
+    "product_name": "避妊・去勢した猫の体重ケア",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 330
+  },
+  {
+    "brand": "AllWell",
+    "product_name": "10歳以上の腎臓の健康維持用",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "AllWell",
+    "product_name": "子猫用",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 400
+  },
+  {
+    "brand": "AllWell",
+    "product_name": "下部尿路の健康維持用",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 350
+  },
+  {
+    "brand": "GRANDS",
+    "product_name": "チキン",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 361
+  },
+  {
+    "brand": "GRANDS",
+    "product_name": "サーモン",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 361
+  },
+  {
+    "brand": "カナガン",
+    "product_name": "チキン",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 405
+  },
+  {
+    "brand": "カナガン",
+    "product_name": "サーモン",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 398
+  },
+  {
+    "brand": "キャラット",
+    "product_name": "まぐろ仕立ての味わいブレンド",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "キャラット",
+    "product_name": "下部尿路の健康維持",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "グランデリ",
+    "product_name": "無添加 ささみ",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 15
+  },
+  {
+    "brand": "グランデリ",
+    "product_name": "ふりかけ かつお",
+    "type": "treat",
+    "target_age": "all_ages",
+    "calories_per_100g": 20
+  },
+  {
+    "brand": "コンボ",
+    "product_name": "まぐろ味・カニチップ・まぐろ節添え",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 370
+  },
+  {
+    "brand": "コンボ",
+    "product_name": "毛玉対応 まぐろ味・ささみチップ",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "コンボ",
+    "product_name": "子ねこ用 ミルクチップ添え",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 400
+  },
+  {
+    "brand": "コンボ",
+    "product_name": "肥満が気になる猫用 まぐろ味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 330
+  },
+  {
+    "brand": "セレクトバランス",
+    "product_name": "グレインフリー キトン チキン",
+    "type": "dry",
+    "target_age": "kitten",
+    "calories_per_100g": 390
+  },
+  {
+    "brand": "セレクトバランス",
+    "product_name": "グレインフリー アダルト チキン",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 380
+  },
+  {
+    "brand": "ねこ元気",
+    "product_name": "まぐろ・かつお・白身魚入り",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "ねこ元気",
+    "product_name": "複数ねこ用 まぐろ・かつお味",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "ねこ元気",
+    "product_name": "下部尿路の健康維持 まぐろ味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 355
+  },
+  {
+    "brand": "ねこ元気",
+    "product_name": "15歳以上用 まぐろ・白身魚・かつお味",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "ビューティープロ",
+    "product_name": "成猫用 1歳から フィッシュ味",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 365
+  },
+  {
+    "brand": "ビューティープロ",
+    "product_name": "下部尿路の健康維持 1歳から",
+    "type": "dry",
+    "target_age": "adult",
+    "calories_per_100g": 360
+  },
+  {
+    "brand": "ビューティープロ",
+    "product_name": "15歳以上 腎臓の健康維持",
+    "type": "dry",
+    "target_age": "senior",
+    "calories_per_100g": 370
+  },
+  {
+    "brand": "フィリックス",
+    "product_name": "やわらかグリル 成猫用 ゼリー仕立て チキン",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 75
+  },
+  {
+    "brand": "フィリックス",
+    "product_name": "やわらかグリル 成猫用 ゼリー仕立て ツナ",
+    "type": "wet",
+    "target_age": "adult",
+    "calories_per_100g": 70
+  },
+  {
+    "brand": "フィリックス",
+    "product_name": "やわらかグリル 子ねこ用 ゼリー仕立て チキン",
+    "type": "wet",
+    "target_age": "kitten",
+    "calories_per_100g": 85
+  },
+  {
+    "brand": "モグニャン",
+    "product_name": "白身魚",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": 379
+  },
+  {
+    "brand": "無一物",
+    "product_name": "パウチ かつお",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 45
+  },
+  {
+    "brand": "無一物",
+    "product_name": "パウチ まぐろ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 50
+  },
+  {
+    "brand": "無一物",
+    "product_name": "パウチ ささみ",
+    "type": "wet",
+    "target_age": "all_ages",
+    "calories_per_100g": 40
+  },
+  {
+    "brand": "その他",
+    "product_name": "その他のフード",
+    "type": "dry",
+    "target_age": "all_ages",
+    "calories_per_100g": null
+  }
+]
