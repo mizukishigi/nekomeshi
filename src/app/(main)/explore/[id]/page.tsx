@@ -91,9 +91,9 @@ export default async function ExploreFoodDetailPage({
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
               <p className="text-xs text-text-muted">{food.brand}</p>
-              <p className="mt-0.5 text-lg font-bold text-text">
+              <h1 className="mt-0.5 text-lg font-bold text-text">
                 {food.product_name}
-              </p>
+              </h1>
             </div>
             <Badge variant={food.type as 'dry' | 'wet' | 'treat'}>
               {FOOD_TYPE_LABELS[food.type]}
