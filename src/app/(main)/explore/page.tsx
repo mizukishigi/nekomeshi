@@ -24,18 +24,13 @@ export default async function ExplorePage({
   const typeFilter = params.type || ''
   const ageFilter = params.age || ''
 
-  const hasFilter = !!query || !!typeFilter || !!ageFilter
-
-  let foods: Food[] = []
-  if (hasFilter) {
-    const allFoods = await getAllFoodsPublic(query)
-    foods = allFoods.filter((f) => f.brand !== 'その他')
-    if (typeFilter && ['dry', 'wet', 'treat'].includes(typeFilter)) {
-      foods = foods.filter((f) => f.type === typeFilter)
-    }
-    if (ageFilter && ['kitten', 'adult', 'senior', 'all_ages'].includes(ageFilter)) {
-      foods = foods.filter((f) => f.target_age === ageFilter)
-    }
+  const allFoods = await getAllFoodsPublic(query)
+  let foods = allFoods.filter((f) => f.brand !== 'その他')
+  if (typeFilter && ['dry', 'wet', 'treat'].includes(typeFilter)) {
+    foods = foods.filter((f) => f.type === typeFilter)
+  }
+  if (ageFilter && ['kitten', 'adult', 'senior', 'all_ages'].includes(ageFilter)) {
+    foods = foods.filter((f) => f.target_age === ageFilter)
   }
 
   const typeFilters = [
@@ -110,12 +105,7 @@ export default async function ExplorePage({
           </div>
         </div>
 
-        {!hasFilter ? (
-          <div className="mt-8 text-center text-text-muted">
-            <p className="text-sm">キーワードやフィルターで</p>
-            <p className="text-sm">ごはんを検索してみましょう</p>
-          </div>
-        ) : foods.length === 0 ? (
+        {foods.length === 0 ? (
           <div className="rounded-2xl bg-surface p-8 text-center shadow-sm mt-3">
             <p className="text-sm text-text-muted">
               該当するごはんが見つかりません
