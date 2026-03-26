@@ -9,6 +9,9 @@ import { getAllFoodsPublic, type Food } from '@/actions/foods'
 export const metadata: Metadata = {
   title: 'キャットフードを探す',
   description: 'みんなの記録から、うちの子に合うキャットフードを探そう。ドライ・ウェット・おやつ、子猫からシニアまで200種以上のフードを比較。',
+  alternates: {
+    canonical: '/explore',
+  },
 }
 
 export default async function ExplorePage({

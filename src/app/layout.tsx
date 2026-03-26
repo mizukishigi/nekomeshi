@@ -40,6 +40,9 @@ export const metadata: Metadata = {
     description: '愛猫のごはんを記録して、みんなの記録からうちの子に合うフードを探そう。',
     images: ['/ogp-icon.png'],
   },
+  alternates: {
+    canonical: '/',
+  },
   other: {
     'theme-color': '#F97316',
   },
