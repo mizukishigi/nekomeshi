@@ -30,12 +30,21 @@ export async function searchFoods(query: string): Promise<Food[]> {
     return data as Food[]
   }
 
-  const { data, error } = await supabase
+  const { expandSearchQuery } = await import('@/lib/utils')
+  const words = expandSearchQuery(query)
+
+  let q = supabase
     .from('foods')
     .select('*')
     .neq('brand', 'その他')
-    .or(`brand.ilike.%${query}%,product_name.ilike.%${query}%`)
-    .order('created_at', { ascending: false })
+
+  for (const word of words) {
+    q = q.or(`brand.ilike.%${word}%,product_name.ilike.%${word}%`)
+  }
+
+  const { data, error } = await q
+    .order('brand', { ascending: true })
+    .order('product_name', { ascending: true })
     .limit(20)
 
   if (error) throw error
@@ -178,7 +187,12 @@ export async function getAllFoodsPublic(query?: string): Promise<Food[]> {
     .order('product_name', { ascending: true })
 
   if (query?.trim()) {
-    q = q.or(`brand.ilike.%${query}%,product_name.ilike.%${query}%`)
+    const { expandSearchQuery } = await import('@/lib/utils')
+    const words = expandSearchQuery(query)
+    // 各ワードがbrandまたはproduct_nameに含まれる（AND検索）
+    for (const word of words) {
+      q = q.or(`brand.ilike.%${word}%,product_name.ilike.%${word}%`)
+    }
   }
 
   const { data, error } = await q
