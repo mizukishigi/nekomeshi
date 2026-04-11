@@ -1,0 +1,114 @@
+name: PR Review Judge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  deny-gate:
+    name: Deny gate (path-based)
+    runs-on: ubuntu-latest
+    outputs:
+      denied: ${{ steps.check.outputs.denied }}
+      reason: ${{ steps.check.outputs.reason }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed files
+        id: check
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          git fetch origin "$BASE_REF" --depth=1
+          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -E '^\.github/workflows/' >/dev/null; then
+            echo "denied=true" >> "$GITHUB_OUTPUT"
+            echo "reason=ワークフローファイル (.github/workflows/**) の変更は必ず人間レビューが必要です。" >> "$GITHUB_OUTPUT"
+          else
+            echo "denied=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ensure label exists
+        if: steps.check.outputs.denied == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create needs-human-review \
+            --color B60205 \
+            --description "人間レビュー必須" 2>/dev/null || true
+
+      - name: Apply label & comment
+        if: steps.check.outputs.denied == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REASON: ${{ steps.check.outputs.reason }}
+        run: |
+          gh pr edit "$PR_NUMBER" --add-label needs-human-review
+          gh pr comment "$PR_NUMBER" --body "🔒 **Deny gate triggered**
+
+          ${REASON}
+
+          allow-gate (Claude 自動判定) はスキップされました。"
+
+  allow-gate:
+    name: Allow gate (Claude judgment)
+    needs: deny-gate
+    if: needs.deny-gate.outputs.denied == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure labels exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create claude-auto-approved \
+            --color 0E8A16 \
+            --description "Claude が自動承認可と判定" 2>/dev/null || true
+          gh label create needs-human-review \
+            --color B60205 \
+            --description "人間レビュー必須" 2>/dev/null || true
+
+      - name: Run Claude review judge
+        uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            あなたは nekomeshi リポジトリの PR レビュー判定ボットです。以下の手順で作業してください。
+
+            1. `.github/pr-review-criteria.md` を Read ツールで読み込み、判定基準を把握する
+            2. `gh pr diff $PR_NUMBER` を実行して PR の変更内容を取得する
+            3. 基準に沿って影響レベル (low / medium / high) と判定 (auto-approve / needs-human-review) を決める
+            4. 結果に応じてラベルを付与する:
+               - auto-approve の場合: `gh pr edit $PR_NUMBER --add-label claude-auto-approved`
+               - needs-human-review の場合: `gh pr edit $PR_NUMBER --add-label needs-human-review`
+            5. `gh pr comment $PR_NUMBER --body "..."` で日本語のコメントを投稿する
+
+            コメントのフォーマット:
+            ```
+            🤖 **Claude PR Review Judge**
+            - 影響レベル: <low|medium|high>
+            - 判定: <auto-approve|needs-human-review>
+            - 理由: <2-3行で簡潔に>
+            ```
+
+            判断に迷った場合は必ず needs-human-review を選んでください。
+          claude_args: '--allowed-tools "Read,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr edit:*),Bash(gh pr comment:*)"'
