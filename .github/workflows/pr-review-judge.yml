@@ -10,6 +10,20 @@ permissions:
   issues: write
   id-token: write
 
+# ------------------------------------------------------------------
+# PR path rules
+#   Edit the pattern lists below to adjust which files are treated as
+#   critical (always needs human review) or trivial (auto-approved).
+#   Each line is an ERE regex matched against changed file paths.
+# ------------------------------------------------------------------
+env:
+  DENY_PATTERNS: |
+    ^\.github/workflows/
+  ALLOW_PATTERNS: |
+    (^|/)[^/]+\.md$
+    ^public/
+    ^\.gitignore$
+
 jobs:
   static-deny:
     name: Static deny (critical paths)
@@ -19,7 +33,7 @@ jobs:
       denied: ${{ steps.check.outputs.denied }}
       reason: ${{ steps.check.outputs.reason }}
     steps:
-      - name: Detect changed files and match critical paths
+      - name: Match against DENY_PATTERNS
         id: check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -30,9 +44,12 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED"
 
-          if echo "$CHANGED" | grep -E '^\.github/workflows/' >/dev/null; then
+          DENY_REGEX=$(echo "$DENY_PATTERNS" | grep -vE '^$' | paste -sd '|' -)
+
+          if [ -n "$DENY_REGEX" ] && echo "$CHANGED" | grep -E "$DENY_REGEX" >/dev/null; then
+            MATCHED=$(echo "$CHANGED" | grep -E "$DENY_REGEX" | head -3 | tr '\n' ' ' | sed 's/ $//')
             echo "denied=true" >> "$GITHUB_OUTPUT"
-            echo "reason=ワークフローファイル (.github/workflows/**) の変更は必ず人間レビューが必要です" >> "$GITHUB_OUTPUT"
+            echo "reason=critical path への変更があります: $MATCHED" >> "$GITHUB_OUTPUT"
           else
             echo "denied=false" >> "$GITHUB_OUTPUT"
           fi
@@ -45,7 +62,7 @@ jobs:
     outputs:
       approved: ${{ steps.check.outputs.approved }}
     steps:
-      - name: Detect changed files and match trivial whitelist
+      - name: Match against ALLOW_PATTERNS
         id: check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,12 +73,16 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED"
 
-          # Whitelist: **/*.md, public/**, .gitignore
-          UNSAFE=$(echo "$CHANGED" | grep -vE '(^|/)[^/]+\.md$|^public/|^\.gitignore$' || true)
+          ALLOW_REGEX=$(echo "$ALLOW_PATTERNS" | grep -vE '^$' | paste -sd '|' -)
 
-          if [ -z "$CHANGED" ]; then
+          if [ -z "$CHANGED" ] || [ -z "$ALLOW_REGEX" ]; then
             echo "approved=false" >> "$GITHUB_OUTPUT"
-          elif [ -z "$UNSAFE" ]; then
+            exit 0
+          fi
+
+          UNSAFE=$(echo "$CHANGED" | grep -vE "$ALLOW_REGEX" || true)
+
+          if [ -z "$UNSAFE" ]; then
             echo "approved=true" >> "$GITHUB_OUTPUT"
           else
             echo "approved=false" >> "$GITHUB_OUTPUT"
@@ -77,7 +98,7 @@ jobs:
       needs.static-allow.outputs.approved == 'false'
     runs-on: ubuntu-latest
     outputs:
-      verdict: ${{ steps.read.outputs.verdict }}
+      needs_review: ${{ steps.read.outputs.needs_review }}
       impact: ${{ steps.read.outputs.impact }}
       reason: ${{ steps.read.outputs.reason }}
     steps:
@@ -105,38 +126,38 @@ jobs:
           prompt: ${{ steps.load_prompt.outputs.content }}
           claude_args: '--model claude-haiku-4-5 --allowed-tools "Read,Write,Bash(gh pr diff:*)"'
 
-      - name: Read verdict
+      - name: Read Claude result
         id: read
         run: |
-          if [ ! -f /tmp/claude-verdict.json ]; then
-            echo "Claude did not produce /tmp/claude-verdict.json" >&2
+          if [ ! -f /tmp/pr-review-result.json ]; then
+            echo "Claude did not produce /tmp/pr-review-result.json" >&2
             exit 1
           fi
 
-          cat /tmp/claude-verdict.json
+          cat /tmp/pr-review-result.json
 
-          VERDICT=$(jq -r .verdict /tmp/claude-verdict.json)
-          IMPACT=$(jq -r .impact /tmp/claude-verdict.json)
-          REASON=$(jq -r .reason /tmp/claude-verdict.json)
+          NEEDS_REVIEW=$(jq -r .needs_review /tmp/pr-review-result.json)
+          IMPACT=$(jq -r .impact /tmp/pr-review-result.json)
+          REASON=$(jq -r .reason /tmp/pr-review-result.json)
 
-          echo "verdict=$VERDICT" >> "$GITHUB_OUTPUT"
+          echo "needs_review=$NEEDS_REVIEW" >> "$GITHUB_OUTPUT"
           echo "impact=$IMPACT" >> "$GITHUB_OUTPUT"
           echo "reason=$REASON" >> "$GITHUB_OUTPUT"
 
-  apply-result:
-    name: Apply judgment to PR
+  post-review-status:
+    name: Post review status to PR
     needs: [static-deny, static-allow, dynamic-judge]
     if: >
       always() &&
       (needs.static-deny.outputs.denied == 'true' ||
        needs.static-allow.outputs.approved == 'true' ||
-       needs.dynamic-judge.outputs.verdict != '')
+       needs.dynamic-judge.outputs.needs_review != '')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (for scripts)
         uses: actions/checkout@v4
 
-      - name: Apply judgment
+      - name: Post review status
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -144,9 +165,9 @@ jobs:
           DENY_DENIED: ${{ needs.static-deny.outputs.denied }}
           DENY_REASON: ${{ needs.static-deny.outputs.reason }}
           ALLOW_APPROVED: ${{ needs.static-allow.outputs.approved }}
-          DYNAMIC_VERDICT: ${{ needs.dynamic-judge.outputs.verdict }}
+          DYNAMIC_NEEDS_REVIEW: ${{ needs.dynamic-judge.outputs.needs_review }}
           DYNAMIC_IMPACT: ${{ needs.dynamic-judge.outputs.impact }}
           DYNAMIC_REASON: ${{ needs.dynamic-judge.outputs.reason }}
         run: |
-          chmod +x .github/scripts/apply-judgment.sh
-          .github/scripts/apply-judgment.sh
+          chmod +x .github/scripts/post-review-status.sh
+          .github/scripts/post-review-status.sh

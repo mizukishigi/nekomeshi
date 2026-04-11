@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+#
+# Post PR review status: apply a label and a comment indicating whether this
+# PR needs human review.
+#
+# Consumes upstream judgment outputs via environment variables and picks the
+# first decisive gate (priority: static-deny > static-allow > dynamic-judge).
+#
+# Required env:
+#   GH_TOKEN               — GitHub token with pull-requests:write + issues:write
+#   PR_NUMBER              — Target PR number
+#   HEAD_SHA               — PR head commit SHA (for short-sha display)
+#   DENY_DENIED            — 'true' | 'false' (from static-deny.outputs.denied)
+#   ALLOW_APPROVED         — 'true' | 'false' (from static-allow.outputs.approved)
+# Optional env (dynamic branch):
+#   DENY_REASON            — text shown when DENY_DENIED=true
+#   DYNAMIC_NEEDS_REVIEW   — 'true' | 'false' (from Claude)
+#   DYNAMIC_IMPACT         — 'low' | 'medium' | 'high'
+#   DYNAMIC_REASON         — free-text reason from Claude
+
+set -euo pipefail
+
+: "${GH_TOKEN:?}"
+: "${PR_NUMBER:?}"
+: "${HEAD_SHA:?}"
+: "${DENY_DENIED:?}"
+: "${ALLOW_APPROVED:?}"
+
+SHORT_SHA="${HEAD_SHA:0:7}"
+
+# Ensure both labels exist (idempotent)
+gh label create needs-human-review --color B60205 --description "人間レビュー必須" 2>/dev/null || true
+gh label create skip-human-review  --color 0E8A16 --description "人間レビュー不要" 2>/dev/null || true
+
+# Pick the winning gate in priority order.
+if [ "$DENY_DENIED" = "true" ]; then
+  NEEDS_REVIEW=true
+  SOURCE="🔒 Static deny (critical paths)"
+  REASON="${DENY_REASON:-critical path への変更があります}"
+  IMPACT=""
+elif [ "$ALLOW_APPROVED" = "true" ]; then
+  NEEDS_REVIEW=false
+  SOURCE="✅ Static allow (trivial paths)"
+  REASON="全変更ファイルが trivial path whitelist に収まっています"
+  IMPACT=""
+else
+  NEEDS_REVIEW="${DYNAMIC_NEEDS_REVIEW:?}"
+  SOURCE="🤖 Dynamic judge (Claude)"
+  REASON="${DYNAMIC_REASON:-}"
+  IMPACT="${DYNAMIC_IMPACT:-}"
+fi
+
+echo "Winner: $SOURCE / needs_review=$NEEDS_REVIEW"
+
+# Swap labels: remove the opposite, add the winner.
+if [ "$NEEDS_REVIEW" = "true" ]; then
+  gh pr edit "$PR_NUMBER" --remove-label skip-human-review 2>/dev/null || true
+  gh pr edit "$PR_NUMBER" --add-label needs-human-review
+  LABEL="needs-human-review"
+else
+  gh pr edit "$PR_NUMBER" --remove-label needs-human-review 2>/dev/null || true
+  gh pr edit "$PR_NUMBER" --add-label skip-human-review
+  LABEL="skip-human-review"
+fi
+
+# Build comment body. The HTML marker on line 1 is reserved for future use.
+{
+  echo "<!-- pr-review-judge -->"
+  echo "**$SOURCE**"
+  echo "- Commit: \`$SHORT_SHA\`"
+  [ -n "$IMPACT" ] && echo "- 影響レベル: $IMPACT"
+  echo "- 人間レビュー: \`$LABEL\`"
+  echo "- 理由: $REASON"
+} > /tmp/pr-review-comment.md
+
+cat /tmp/pr-review-comment.md
+
+gh pr comment "$PR_NUMBER" --body-file /tmp/pr-review-comment.md
