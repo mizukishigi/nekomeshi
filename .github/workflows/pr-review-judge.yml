@@ -11,8 +11,9 @@ permissions:
   id-token: write
 
 jobs:
-  deny-gate:
-    name: Deny gate (path-based)
+  static-deny:
+    name: Static deny (critical paths)
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     outputs:
       denied: ${{ steps.check.outputs.denied }}
@@ -40,33 +41,124 @@ jobs:
             echo "denied=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Ensure label exists
+      - name: Ensure labels exist
         if: steps.check.outputs.denied == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh label create needs-human-review \
-            --color B60205 \
-            --description "人間レビュー必須" 2>/dev/null || true
+          gh label create needs-human-review --color B60205 --description "人間レビュー必須" 2>/dev/null || true
+          gh label create skip-human-review --color 0E8A16 --description "人間レビュー不要" 2>/dev/null || true
 
-      - name: Apply label & comment
+      - name: Dedup, label, comment
         if: steps.check.outputs.denied == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
           REASON: ${{ steps.check.outputs.reason }}
         run: |
+          SHORT_SHA="${HEAD_SHA:0:7}"
+
+          # Delete existing judge comments (marker-based dedup)
+          gh api "repos/$REPO/issues/$PR_NUMBER/comments" \
+            --jq '.[] | select(.body | contains("<!-- pr-review-judge -->")) | .id' \
+            | while read -r id; do
+                [ -n "$id" ] && gh api -X DELETE "repos/$REPO/issues/comments/$id"
+              done
+
+          # Swap labels
+          gh pr edit "$PR_NUMBER" --remove-label skip-human-review 2>/dev/null || true
           gh pr edit "$PR_NUMBER" --add-label needs-human-review
-          gh pr comment "$PR_NUMBER" --body "🔒 **Deny gate triggered**
 
-          ${REASON}
+          # Post new comment
+          gh pr comment "$PR_NUMBER" --body "$(cat <<EOF
+          <!-- pr-review-judge -->
+          🔒 **Static deny (critical paths)**
+          - Commit: \`$SHORT_SHA\`
+          - 判定: needs-human-review
+          - 理由: $REASON
+          EOF
+          )"
 
-          allow-gate (Claude 自動判定) はスキップされました。"
+  static-allow:
+    name: Static allow (trivial paths)
+    needs: static-deny
+    if: needs.static-deny.outputs.denied == 'false'
+    runs-on: ubuntu-latest
+    outputs:
+      approved: ${{ steps.check.outputs.approved }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-  allow-gate:
-    name: Allow gate (Claude judgment)
-    needs: deny-gate
-    if: needs.deny-gate.outputs.denied == 'false'
+      - name: Detect changed files
+        id: check
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          git fetch origin "$BASE_REF" --depth=1
+          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          # Whitelist: *.md, public/**, .gitignore
+          UNSAFE=$(echo "$CHANGED" | grep -vE '(^|/)[^/]+\.md$|^public/|^\.gitignore$' || true)
+
+          if [ -z "$CHANGED" ]; then
+            echo "approved=false" >> "$GITHUB_OUTPUT"
+          elif [ -z "$UNSAFE" ]; then
+            echo "approved=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "approved=false" >> "$GITHUB_OUTPUT"
+            echo "Files outside whitelist:"
+            echo "$UNSAFE"
+          fi
+
+      - name: Ensure labels exist
+        if: steps.check.outputs.approved == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create needs-human-review --color B60205 --description "人間レビュー必須" 2>/dev/null || true
+          gh label create skip-human-review --color 0E8A16 --description "人間レビュー不要" 2>/dev/null || true
+
+      - name: Dedup, label, comment
+        if: steps.check.outputs.approved == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          SHORT_SHA="${HEAD_SHA:0:7}"
+
+          gh api "repos/$REPO/issues/$PR_NUMBER/comments" \
+            --jq '.[] | select(.body | contains("<!-- pr-review-judge -->")) | .id' \
+            | while read -r id; do
+                [ -n "$id" ] && gh api -X DELETE "repos/$REPO/issues/comments/$id"
+              done
+
+          gh pr edit "$PR_NUMBER" --remove-label needs-human-review 2>/dev/null || true
+          gh pr edit "$PR_NUMBER" --add-label skip-human-review
+
+          gh pr comment "$PR_NUMBER" --body "$(cat <<EOF
+          <!-- pr-review-judge -->
+          ✅ **Static allow (trivial paths)**
+          - Commit: \`$SHORT_SHA\`
+          - 判定: skip-human-review
+          - 理由: 全変更ファイルが whitelist (\`**/*.md\`, \`public/**\`, \`.gitignore\`) 内に収まっています。
+          EOF
+          )"
+
+  dynamic-judge:
+    name: Dynamic judge (Claude)
+    needs: [static-deny, static-allow]
+    if: >
+      needs.static-deny.outputs.denied == 'false' &&
+      needs.static-allow.outputs.approved == 'false'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -78,12 +170,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh label create claude-auto-approved \
-            --color 0E8A16 \
-            --description "Claude が自動承認可と判定" 2>/dev/null || true
-          gh label create needs-human-review \
-            --color B60205 \
-            --description "人間レビュー必須" 2>/dev/null || true
+          gh label create needs-human-review --color B60205 --description "人間レビュー必須" 2>/dev/null || true
+          gh label create skip-human-review --color 0E8A16 --description "人間レビュー不要" 2>/dev/null || true
 
       - name: Run Claude review judge
         uses: anthropics/claude-code-action@v1
@@ -99,24 +187,24 @@ jobs:
 
             1. `.github/pr-review-criteria.md` を Read ツールで読み込み、判定基準を把握する
             2. `gh pr diff $PR_NUMBER` を実行して PR の変更内容を取得する
-            3. 基準に沿って影響レベル (low / medium / high) と判定 (auto-approve / needs-human-review) を決める
+            3. 基準に沿って影響レベル (low / medium / high) と判定 (skip-human-review / needs-human-review) を決める
             4. 既存の判定コメントを削除する (PR に残すのは常に最新の 1 件だけにしたい):
-               - 既存コメント ID を取得: `gh api "repos/$REPO/issues/$PR_NUMBER/comments" --jq '.[] | select(.body | contains("<!-- claude-pr-review-judge -->")) | .id'`
+               - 既存コメント ID を取得: `gh api "repos/$REPO/issues/$PR_NUMBER/comments" --jq '.[] | select(.body | contains("<!-- pr-review-judge -->")) | .id'`
                - ヒットした各 ID に対して削除: `gh api -X DELETE "repos/$REPO/issues/comments/<id>"`
                - 既存コメントが無ければスキップして良い
             5. ラベルを更新する (反対側ラベルを外してから新ラベルを付与):
-               - auto-approve の場合: `gh pr edit $PR_NUMBER --remove-label needs-human-review --add-label claude-auto-approved`
-               - needs-human-review の場合: `gh pr edit $PR_NUMBER --remove-label claude-auto-approved --add-label needs-human-review`
+               - skip-human-review の場合: `gh pr edit $PR_NUMBER --remove-label needs-human-review --add-label skip-human-review`
+               - needs-human-review の場合: `gh pr edit $PR_NUMBER --remove-label skip-human-review --add-label needs-human-review`
                - `--remove-label` は対象ラベルが PR に付いていなければエラーになるので、その場合はエラーを無視して `--add-label` のみを再実行してよい
-            6. 新しい判定コメントを投稿する。必ず先頭行に HTML マーカーを入れ、本文に commit の先頭 7 文字の SHA を含めること。短縮 SHA は `$HEAD_SHA` の先頭 7 文字を使う。
+            6. 新しい判定コメントを投稿する。必ず先頭行に HTML マーカー `<!-- pr-review-judge -->` を入れ、本文に commit の先頭 7 文字の SHA を含めること。短縮 SHA は `$HEAD_SHA` の先頭 7 文字を使う。
 
             コメント本文フォーマット (この通りに投稿):
             ```
-            <!-- claude-pr-review-judge -->
-            🤖 **Claude PR Review Judge**
+            <!-- pr-review-judge -->
+            🤖 **Dynamic judge (Claude)**
             - Commit: `<short-sha>`
             - 影響レベル: <low|medium|high>
-            - 判定: <auto-approve|needs-human-review>
+            - 判定: <skip-human-review|needs-human-review>
             - 理由: <2-3行で簡潔に>
             ```
 

@@ -32,7 +32,7 @@
 判定後、Claude は必ず以下を実行してください。
 
 1. 対応するラベルを 1 つだけ付与する
-   - Low → `claude-auto-approved`
+   - Low → `skip-human-review`
    - Medium / High → `needs-human-review`
 2. PR コメントを日本語で 1 件投稿する。以下を必ず含めること:
    - 影響レベル (`low` / `medium` / `high`)
