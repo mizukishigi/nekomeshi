@@ -1,5 +1,6 @@
 'use client'
 
+// draft-recheck: verify check-draft gatekeeper skips draft PRs entirely
 import { cn } from '@/lib/utils'
 import { InputHTMLAttributes, Ref } from 'react'
 
