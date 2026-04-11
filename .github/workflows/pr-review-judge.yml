@@ -90,6 +90,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -98,18 +100,25 @@ jobs:
             1. `.github/pr-review-criteria.md` を Read ツールで読み込み、判定基準を把握する
             2. `gh pr diff $PR_NUMBER` を実行して PR の変更内容を取得する
             3. 基準に沿って影響レベル (low / medium / high) と判定 (auto-approve / needs-human-review) を決める
-            4. 結果に応じてラベルを付与する:
-               - auto-approve の場合: `gh pr edit $PR_NUMBER --add-label claude-auto-approved`
-               - needs-human-review の場合: `gh pr edit $PR_NUMBER --add-label needs-human-review`
-            5. `gh pr comment $PR_NUMBER --body "..."` で日本語のコメントを投稿する
+            4. 既存の判定コメントを削除する (PR に残すのは常に最新の 1 件だけにしたい):
+               - 既存コメント ID を取得: `gh api "repos/$REPO/issues/$PR_NUMBER/comments" --jq '.[] | select(.body | contains("<!-- claude-pr-review-judge -->")) | .id'`
+               - ヒットした各 ID に対して削除: `gh api -X DELETE "repos/$REPO/issues/comments/<id>"`
+               - 既存コメントが無ければスキップして良い
+            5. ラベルを更新する (反対側ラベルを外してから新ラベルを付与):
+               - auto-approve の場合: `gh pr edit $PR_NUMBER --remove-label needs-human-review --add-label claude-auto-approved`
+               - needs-human-review の場合: `gh pr edit $PR_NUMBER --remove-label claude-auto-approved --add-label needs-human-review`
+               - `--remove-label` は対象ラベルが PR に付いていなければエラーになるので、その場合はエラーを無視して `--add-label` のみを再実行してよい
+            6. 新しい判定コメントを投稿する。必ず先頭行に HTML マーカーを入れ、本文に commit の先頭 7 文字の SHA を含めること。短縮 SHA は `$HEAD_SHA` の先頭 7 文字を使う。
 
-            コメントのフォーマット:
+            コメント本文フォーマット (この通りに投稿):
             ```
+            <!-- claude-pr-review-judge -->
             🤖 **Claude PR Review Judge**
+            - Commit: `<short-sha>`
             - 影響レベル: <low|medium|high>
             - 判定: <auto-approve|needs-human-review>
             - 理由: <2-3行で簡潔に>
             ```
 
             判断に迷った場合は必ず needs-human-review を選んでください。
-          claude_args: '--model claude-haiku-4-5 --allowed-tools "Read,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr edit:*),Bash(gh pr comment:*)"'
+          claude_args: '--model claude-haiku-4-5 --allowed-tools "Read,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr edit:*),Bash(gh pr comment:*),Bash(gh api:*)"'
