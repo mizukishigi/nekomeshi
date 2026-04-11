@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils'
 import { HTMLAttributes } from 'react'
 
+// scenario-e: draft PR, any diff works
 type CardProps = HTMLAttributes<HTMLDivElement>
 
 export function Card({ className, children, ...props }: CardProps) {
