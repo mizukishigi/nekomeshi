@@ -11,85 +11,78 @@ permissions:
   id-token: write
 
 jobs:
-  check-draft:
-    name: Check draft (gate)
+  static-deny:
+    name: Static deny (critical paths)
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    outputs:
+      denied: ${{ steps.check.outputs.denied }}
+      reason: ${{ steps.check.outputs.reason }}
     steps:
-      - run: echo "PR is not draft. Proceeding to judgment pipeline."
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-  detect-changes:
-    name: Detect changes and match paths
-    needs: check-draft
+      - name: Detect changed files and match critical paths
+        id: check
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          git fetch origin "$BASE_REF" --depth=1
+          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -E '^\.github/workflows/' >/dev/null; then
+            echo "denied=true" >> "$GITHUB_OUTPUT"
+            echo "reason=ワークフローファイル (.github/workflows/**) の変更は必ず人間レビューが必要です" >> "$GITHUB_OUTPUT"
+          else
+            echo "denied=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  static-allow:
+    name: Static allow (trivial paths)
+    needs: static-deny
+    if: needs.static-deny.outputs.denied == 'false'
     runs-on: ubuntu-latest
     outputs:
-      denied: ${{ steps.decide.outputs.denied }}
-      approved: ${{ steps.decide.outputs.approved }}
-      reason: ${{ steps.decide.outputs.reason }}
+      approved: ${{ steps.check.outputs.approved }}
     steps:
-      - name: Match changed paths
-        uses: dorny/paths-filter@v3
-        id: filter
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          list-files: json
-          filters: |
-            all:
-              - '**'
-            deny:
-              - '.github/workflows/**'
-            allow:
-              - '**/*.md'
-              - 'public/**'
-              - '.gitignore'
+          fetch-depth: 0
 
-      - name: Decide verdict
-        id: decide
+      - name: Detect changed files and match trivial whitelist
+        id: check
         env:
-          ALL_FILES_JSON: ${{ steps.filter.outputs.all_files }}
-          DENY_FILES_JSON: ${{ steps.filter.outputs.deny_files }}
-          ALLOW_FILES_JSON: ${{ steps.filter.outputs.allow_files }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
-          ALL=$(echo "$ALL_FILES_JSON" | jq -r '.[]' | sort -u)
-          DENY=$(echo "$DENY_FILES_JSON" | jq -r '.[]' | sort -u)
-          ALLOW=$(echo "$ALLOW_FILES_JSON" | jq -r '.[]' | sort -u)
+          git fetch origin "$BASE_REF" --depth=1
+          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          echo "Changed files:"
+          echo "$CHANGED"
 
-          echo "All changed files:"
-          echo "$ALL"
-          echo "--"
-          echo "Deny matches:"
-          echo "$DENY"
-          echo "--"
-          echo "Allow matches:"
-          echo "$ALLOW"
+          # Whitelist: **/*.md, public/**, .gitignore
+          UNSAFE=$(echo "$CHANGED" | grep -vE '(^|/)[^/]+\.md$|^public/|^\.gitignore$' || true)
 
-          if [ -n "$DENY" ]; then
-            FIRST=$(echo "$DENY" | head -3 | tr '\n' ' ' | sed 's/ $//')
-            echo "denied=true" >> "$GITHUB_OUTPUT"
+          if [ -z "$CHANGED" ]; then
             echo "approved=false" >> "$GITHUB_OUTPUT"
-            echo "reason=critical path への変更があります: $FIRST" >> "$GITHUB_OUTPUT"
-          elif [ -z "$ALL" ]; then
-            echo "denied=false" >> "$GITHUB_OUTPUT"
-            echo "approved=false" >> "$GITHUB_OUTPUT"
+          elif [ -z "$UNSAFE" ]; then
+            echo "approved=true" >> "$GITHUB_OUTPUT"
           else
-            # Subset check: are all changed files covered by the allow filter?
-            UNSAFE=$(comm -23 <(echo "$ALL") <(echo "$ALLOW"))
-            if [ -z "$UNSAFE" ]; then
-              echo "denied=false" >> "$GITHUB_OUTPUT"
-              echo "approved=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "Files outside whitelist:"
-              echo "$UNSAFE"
-              echo "denied=false" >> "$GITHUB_OUTPUT"
-              echo "approved=false" >> "$GITHUB_OUTPUT"
-            fi
+            echo "approved=false" >> "$GITHUB_OUTPUT"
+            echo "Files outside whitelist:"
+            echo "$UNSAFE"
           fi
 
   dynamic-judge:
     name: Dynamic judge (Claude)
-    needs: detect-changes
+    needs: [static-deny, static-allow]
     if: >
-      needs.detect-changes.outputs.denied == 'false' &&
-      needs.detect-changes.outputs.approved == 'false'
+      needs.static-deny.outputs.denied == 'false' &&
+      needs.static-allow.outputs.approved == 'false'
     runs-on: ubuntu-latest
     outputs:
       verdict: ${{ steps.read.outputs.verdict }}
@@ -140,11 +133,11 @@ jobs:
 
   apply-result:
     name: Apply judgment to PR
-    needs: [detect-changes, dynamic-judge]
+    needs: [static-deny, static-allow, dynamic-judge]
     if: >
       always() &&
-      (needs.detect-changes.outputs.denied == 'true' ||
-       needs.detect-changes.outputs.approved == 'true' ||
+      (needs.static-deny.outputs.denied == 'true' ||
+       needs.static-allow.outputs.approved == 'true' ||
        needs.dynamic-judge.outputs.verdict != '')
     runs-on: ubuntu-latest
     steps:
@@ -156,9 +149,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          DENY_DENIED: ${{ needs.detect-changes.outputs.denied }}
-          DENY_REASON: ${{ needs.detect-changes.outputs.reason }}
-          ALLOW_APPROVED: ${{ needs.detect-changes.outputs.approved }}
+          DENY_DENIED: ${{ needs.static-deny.outputs.denied }}
+          DENY_REASON: ${{ needs.static-deny.outputs.reason }}
+          ALLOW_APPROVED: ${{ needs.static-allow.outputs.approved }}
           DYNAMIC_VERDICT: ${{ needs.dynamic-judge.outputs.verdict }}
           DYNAMIC_IMPACT: ${{ needs.dynamic-judge.outputs.impact }}
           DYNAMIC_REASON: ${{ needs.dynamic-judge.outputs.reason }}
