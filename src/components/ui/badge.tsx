@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 
+// scenario-d: comment-only edit to verify dynamic-judge classifies as low
 type BadgeVariant = 'default' | 'dry' | 'wet' | 'treat'
 
 const variantStyles: Record<BadgeVariant, string> = {
