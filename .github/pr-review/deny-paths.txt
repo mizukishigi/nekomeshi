@@ -1,9 +1,0 @@
-# PR Review Judge — Static deny (critical paths)
-#
-# Format: one ERE (extended regex) pattern per line.
-# Lines starting with # and empty lines are ignored.
-# Matches changed file paths relative to the repo root.
-# If ANY changed file matches ANY pattern, the PR is denied and
-# receives the `needs-human-review` label.
-
-^\.github/workflows/

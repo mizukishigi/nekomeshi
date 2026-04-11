@@ -19,118 +19,77 @@ jobs:
       - run: echo "PR is not draft. Proceeding to judgment pipeline."
 
   detect-changes:
-    name: Detect changed files
+    name: Detect changes and match paths
     needs: check-draft
     runs-on: ubuntu-latest
     outputs:
-      changed_files: ${{ steps.detect.outputs.files }}
+      denied: ${{ steps.decide.outputs.denied }}
+      approved: ${{ steps.decide.outputs.approved }}
+      reason: ${{ steps.decide.outputs.reason }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Match changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
         with:
-          fetch-depth: 0
+          list-files: json
+          filters: |
+            all:
+              - '**'
+            deny:
+              - '.github/workflows/**'
+            allow:
+              - '**/*.md'
+              - 'public/**'
+              - '.gitignore'
 
-      - name: Detect changed files
-        id: detect
+      - name: Decide verdict
+        id: decide
         env:
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          ALL_FILES_JSON: ${{ steps.filter.outputs.all_files }}
+          DENY_FILES_JSON: ${{ steps.filter.outputs.deny_files }}
+          ALLOW_FILES_JSON: ${{ steps.filter.outputs.allow_files }}
         run: |
-          git fetch origin "$BASE_REF" --depth=1
-          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
-          echo "Changed files:"
-          echo "$CHANGED"
-          {
-            echo "files<<CHANGED_FILES_EOF"
-            echo "$CHANGED"
-            echo "CHANGED_FILES_EOF"
-          } >> "$GITHUB_OUTPUT"
+          ALL=$(echo "$ALL_FILES_JSON" | jq -r '.[]' | sort -u)
+          DENY=$(echo "$DENY_FILES_JSON" | jq -r '.[]' | sort -u)
+          ALLOW=$(echo "$ALLOW_FILES_JSON" | jq -r '.[]' | sort -u)
 
-  static-deny:
-    name: Static deny (critical paths)
-    needs: detect-changes
-    runs-on: ubuntu-latest
-    outputs:
-      denied: ${{ steps.check.outputs.denied }}
-      reason: ${{ steps.check.outputs.reason }}
-    steps:
-      - name: Checkout (sparse, config only)
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            .github/pr-review
-          sparse-checkout-cone-mode: false
+          echo "All changed files:"
+          echo "$ALL"
+          echo "--"
+          echo "Deny matches:"
+          echo "$DENY"
+          echo "--"
+          echo "Allow matches:"
+          echo "$ALLOW"
 
-      - name: Match against deny-paths.txt
-        id: check
-        env:
-          CHANGED: ${{ needs.detect-changes.outputs.changed_files }}
-        run: |
-          DENY_FILE=.github/pr-review/deny-paths.txt
-          PATTERNS=$(grep -vE '^(#|$)' "$DENY_FILE" | paste -sd '|' -)
-
-          if [ -z "$PATTERNS" ]; then
-            echo "deny-paths.txt is empty, skipping"
-            echo "denied=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          MATCHED=$(echo "$CHANGED" | grep -E "$PATTERNS" || true)
-
-          if [ -n "$MATCHED" ]; then
-            echo "Matched files:"
-            echo "$MATCHED"
-            REASON="critical path への変更があります: $(echo "$MATCHED" | head -3 | tr '\n' ' ' | sed 's/ $//')"
+          if [ -n "$DENY" ]; then
+            FIRST=$(echo "$DENY" | head -3 | tr '\n' ' ' | sed 's/ $//')
             echo "denied=true" >> "$GITHUB_OUTPUT"
-            echo "reason=$REASON" >> "$GITHUB_OUTPUT"
-          else
+            echo "approved=false" >> "$GITHUB_OUTPUT"
+            echo "reason=critical path への変更があります: $FIRST" >> "$GITHUB_OUTPUT"
+          elif [ -z "$ALL" ]; then
             echo "denied=false" >> "$GITHUB_OUTPUT"
-          fi
-
-  static-allow:
-    name: Static allow (trivial paths)
-    needs: [detect-changes, static-deny]
-    if: needs.static-deny.outputs.denied == 'false'
-    runs-on: ubuntu-latest
-    outputs:
-      approved: ${{ steps.check.outputs.approved }}
-    steps:
-      - name: Checkout (sparse, config only)
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            .github/pr-review
-          sparse-checkout-cone-mode: false
-
-      - name: Match against allow-paths.txt
-        id: check
-        env:
-          CHANGED: ${{ needs.detect-changes.outputs.changed_files }}
-        run: |
-          ALLOW_FILE=.github/pr-review/allow-paths.txt
-          PATTERNS=$(grep -vE '^(#|$)' "$ALLOW_FILE" | paste -sd '|' -)
-
-          if [ -z "$CHANGED" ] || [ -z "$PATTERNS" ]; then
-            echo "No changed files or empty whitelist"
             echo "approved=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          UNSAFE=$(echo "$CHANGED" | grep -vE "$PATTERNS" || true)
-
-          if [ -z "$UNSAFE" ]; then
-            echo "approved=true" >> "$GITHUB_OUTPUT"
           else
-            echo "approved=false" >> "$GITHUB_OUTPUT"
-            echo "Files outside whitelist:"
-            echo "$UNSAFE"
+            # Subset check: are all changed files covered by the allow filter?
+            UNSAFE=$(comm -23 <(echo "$ALL") <(echo "$ALLOW"))
+            if [ -z "$UNSAFE" ]; then
+              echo "denied=false" >> "$GITHUB_OUTPUT"
+              echo "approved=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "Files outside whitelist:"
+              echo "$UNSAFE"
+              echo "denied=false" >> "$GITHUB_OUTPUT"
+              echo "approved=false" >> "$GITHUB_OUTPUT"
+            fi
           fi
 
   dynamic-judge:
     name: Dynamic judge (Claude)
-    needs: [static-deny, static-allow]
+    needs: detect-changes
     if: >
-      needs.static-deny.outputs.denied == 'false' &&
-      needs.static-allow.outputs.approved == 'false'
+      needs.detect-changes.outputs.denied == 'false' &&
+      needs.detect-changes.outputs.approved == 'false'
     runs-on: ubuntu-latest
     outputs:
       verdict: ${{ steps.read.outputs.verdict }}
@@ -181,11 +140,11 @@ jobs:
 
   apply-result:
     name: Apply judgment to PR
-    needs: [static-deny, static-allow, dynamic-judge]
+    needs: [detect-changes, dynamic-judge]
     if: >
       always() &&
-      (needs.static-deny.outputs.denied == 'true' ||
-       needs.static-allow.outputs.approved == 'true' ||
+      (needs.detect-changes.outputs.denied == 'true' ||
+       needs.detect-changes.outputs.approved == 'true' ||
        needs.dynamic-judge.outputs.verdict != '')
     runs-on: ubuntu-latest
     steps:
@@ -197,9 +156,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          DENY_DENIED: ${{ needs.static-deny.outputs.denied }}
-          DENY_REASON: ${{ needs.static-deny.outputs.reason }}
-          ALLOW_APPROVED: ${{ needs.static-allow.outputs.approved }}
+          DENY_DENIED: ${{ needs.detect-changes.outputs.denied }}
+          DENY_REASON: ${{ needs.detect-changes.outputs.reason }}
+          ALLOW_APPROVED: ${{ needs.detect-changes.outputs.approved }}
           DYNAMIC_VERDICT: ${{ needs.dynamic-judge.outputs.verdict }}
           DYNAMIC_IMPACT: ${{ needs.dynamic-judge.outputs.impact }}
           DYNAMIC_REASON: ${{ needs.dynamic-judge.outputs.reason }}
