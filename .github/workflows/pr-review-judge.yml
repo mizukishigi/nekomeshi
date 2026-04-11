@@ -11,9 +11,16 @@ permissions:
   id-token: write
 
 jobs:
-  preflight:
-    name: Preflight (skip draft, detect changed files)
+  check-draft:
+    name: Check draft (gate)
     if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "PR is not draft. Proceeding to judgment pipeline."
+
+  detect-changes:
+    name: Detect changed files
+    needs: check-draft
     runs-on: ubuntu-latest
     outputs:
       changed_files: ${{ steps.detect.outputs.files }}
@@ -40,43 +47,77 @@ jobs:
 
   static-deny:
     name: Static deny (critical paths)
-    needs: preflight
+    needs: detect-changes
     runs-on: ubuntu-latest
     outputs:
       denied: ${{ steps.check.outputs.denied }}
       reason: ${{ steps.check.outputs.reason }}
     steps:
-      - name: Check against critical paths
+      - name: Checkout (sparse, config only)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/pr-review
+          sparse-checkout-cone-mode: false
+
+      - name: Match against deny-paths.txt
         id: check
         env:
-          CHANGED: ${{ needs.preflight.outputs.changed_files }}
+          CHANGED: ${{ needs.detect-changes.outputs.changed_files }}
         run: |
-          if echo "$CHANGED" | grep -E '^\.github/workflows/' >/dev/null; then
+          DENY_FILE=.github/pr-review/deny-paths.txt
+          PATTERNS=$(grep -vE '^(#|$)' "$DENY_FILE" | paste -sd '|' -)
+
+          if [ -z "$PATTERNS" ]; then
+            echo "deny-paths.txt is empty, skipping"
+            echo "denied=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          MATCHED=$(echo "$CHANGED" | grep -E "$PATTERNS" || true)
+
+          if [ -n "$MATCHED" ]; then
+            echo "Matched files:"
+            echo "$MATCHED"
+            REASON="critical path への変更があります: $(echo "$MATCHED" | head -3 | tr '\n' ' ' | sed 's/ $//')"
             echo "denied=true" >> "$GITHUB_OUTPUT"
-            echo "reason=ワークフローファイル (.github/workflows/**) の変更は必ず人間レビューが必要です" >> "$GITHUB_OUTPUT"
+            echo "reason=$REASON" >> "$GITHUB_OUTPUT"
           else
             echo "denied=false" >> "$GITHUB_OUTPUT"
           fi
 
   static-allow:
     name: Static allow (trivial paths)
-    needs: [preflight, static-deny]
+    needs: [detect-changes, static-deny]
     if: needs.static-deny.outputs.denied == 'false'
     runs-on: ubuntu-latest
     outputs:
       approved: ${{ steps.check.outputs.approved }}
     steps:
-      - name: Check against trivial whitelist
+      - name: Checkout (sparse, config only)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/pr-review
+          sparse-checkout-cone-mode: false
+
+      - name: Match against allow-paths.txt
         id: check
         env:
-          CHANGED: ${{ needs.preflight.outputs.changed_files }}
+          CHANGED: ${{ needs.detect-changes.outputs.changed_files }}
         run: |
-          # Whitelist: **/*.md, public/**, .gitignore
-          UNSAFE=$(echo "$CHANGED" | grep -vE '(^|/)[^/]+\.md$|^public/|^\.gitignore$' || true)
+          ALLOW_FILE=.github/pr-review/allow-paths.txt
+          PATTERNS=$(grep -vE '^(#|$)' "$ALLOW_FILE" | paste -sd '|' -)
 
-          if [ -z "$CHANGED" ]; then
+          if [ -z "$CHANGED" ] || [ -z "$PATTERNS" ]; then
+            echo "No changed files or empty whitelist"
             echo "approved=false" >> "$GITHUB_OUTPUT"
-          elif [ -z "$UNSAFE" ]; then
+            exit 0
+          fi
+
+          UNSAFE=$(echo "$CHANGED" | grep -vE "$PATTERNS" || true)
+
+          if [ -z "$UNSAFE" ]; then
             echo "approved=true" >> "$GITHUB_OUTPUT"
           else
             echo "approved=false" >> "$GITHUB_OUTPUT"
@@ -101,6 +142,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Load prompt
+        id: load_prompt
+        run: |
+          {
+            echo "content<<PROMPT_EOF"
+            cat .github/pr-review/dynamic-judge.md
+            echo "PROMPT_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Run Claude review judge
         uses: anthropics/claude-code-action@v1
         env:
@@ -108,28 +158,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: |
-            あなたは nekomeshi リポジトリの PR レビュー判定ボットです。
-            ラベル操作・コメント投稿は後続の job が行うので、あなたは判定結果を JSON ファイルに書き出すだけで終了してください。
-
-            手順:
-            1. `.github/pr-review-criteria.md` を Read ツールで読み込み、判定基準を把握する
-            2. `gh pr diff $PR_NUMBER` を実行して PR の変更内容を取得する
-            3. 基準に沿って影響レベル (low / medium / high) と判定 (skip-human-review / needs-human-review) を決める
-            4. 判定結果を Write ツールで `/tmp/claude-verdict.json` に以下の形式で書き出す:
-
-            ```json
-            {
-              "impact": "low",
-              "verdict": "skip-human-review",
-              "reason": "ここに理由を改行なしの日本語 1 行で"
-            }
-            ```
-
-            制約:
-            - `reason` には改行を含めない (1 行の日本語で簡潔に)
-            - 判断に迷ったら必ず `needs-human-review` を選ぶ
-            - ラベル付与・コメント投稿・gh api は一切呼び出さない (後続 job の責務)
+          prompt: ${{ steps.load_prompt.outputs.content }}
           claude_args: '--model claude-haiku-4-5 --allowed-tools "Read,Write,Bash(gh pr diff:*)"'
 
       - name: Read verdict

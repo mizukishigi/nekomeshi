@@ -41,7 +41,7 @@ if [ "$DENY_DENIED" = "true" ]; then
 elif [ "$ALLOW_APPROVED" = "true" ]; then
   VERDICT="skip-human-review"
   SOURCE="✅ Static allow (trivial paths)"
-  REASON="全変更ファイルが whitelist (\`**/*.md\`, \`public/**\`, \`.gitignore\`) 内に収まっています"
+  REASON="全変更ファイルが \`.github/pr-review/allow-paths.txt\` の whitelist に収まっています"
   IMPACT=""
 else
   VERDICT="${DYNAMIC_VERDICT:?}"
