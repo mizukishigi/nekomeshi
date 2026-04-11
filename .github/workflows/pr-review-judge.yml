@@ -1,5 +1,6 @@
 name: PR Review Judge
 
+# deny-gate test marker
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
