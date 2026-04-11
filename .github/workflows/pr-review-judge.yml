@@ -1,5 +1,6 @@
 name: PR Review Judge
 
+# scenario-a: static-deny test marker
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
