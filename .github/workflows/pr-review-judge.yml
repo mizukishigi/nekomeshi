@@ -115,8 +115,16 @@ jobs:
         id: read
         run: |
           if [ ! -f /tmp/pr-review-result.json ]; then
-            echo "Claude did not produce /tmp/pr-review-result.json" >&2
-            exit 1
+            # Defensive fallback: Claude occasionally skips tool use and
+            # replies with text only. In that case, default to the safe
+            # side (needs_review=true) so a human still looks at the PR.
+            echo "Claude did not produce /tmp/pr-review-result.json; defaulting to needs_review=true" >&2
+            {
+              echo "needs_review=true"
+              echo "impact=unknown"
+              echo "reason=Claude が判定結果を出力しなかったため、安全側で人間レビュー必須と判定"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           cat /tmp/pr-review-result.json
