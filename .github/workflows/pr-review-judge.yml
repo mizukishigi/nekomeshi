@@ -112,4 +112,4 @@ jobs:
             ```
 
             判断に迷った場合は必ず needs-human-review を選んでください。
-          claude_args: '--allowed-tools "Read,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr edit:*),Bash(gh pr comment:*)"'
+          claude_args: '--model claude-haiku-4-5 --allowed-tools "Read,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr edit:*),Bash(gh pr comment:*)"'
