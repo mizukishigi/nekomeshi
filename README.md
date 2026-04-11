@@ -1,3 +1,5 @@
+ねこ飯 (nekomeshi) — 猫のごはん記録 & フード検索 Web アプリ。
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
