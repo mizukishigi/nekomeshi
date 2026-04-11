@@ -88,10 +88,10 @@ jobs:
       - name: Run Claude review judge
         uses: anthropics/claude-code-action@v1
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
             あなたは nekomeshi リポジトリの PR レビュー判定ボットです。以下の手順で作業してください。
 
