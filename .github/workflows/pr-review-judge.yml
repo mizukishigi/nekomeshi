@@ -10,49 +10,27 @@ permissions:
   issues: write
   id-token: write
 
-# ------------------------------------------------------------------
-# PR path rules
-#   Edit the pattern lists below to adjust which files are treated as
-#   critical (always needs human review) or trivial (auto-approved).
-#   Each line is an ERE regex matched against changed file paths.
-# ------------------------------------------------------------------
-env:
-  DENY_PATTERNS: |
-    ^\.github/workflows/
-  ALLOW_PATTERNS: |
-    (^|/)[^/]+\.md$
-    ^public/
-    ^\.gitignore$
-
 jobs:
   static-deny:
     name: Static deny (critical paths)
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     outputs:
-      denied: ${{ steps.check.outputs.denied }}
-      reason: ${{ steps.check.outputs.reason }}
+      denied: ${{ steps.filter.outputs.critical }}
+      matched: ${{ steps.filter.outputs.critical_files }}
     steps:
-      - name: Match against DENY_PATTERNS
-        id: check
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          CHANGED=$(gh pr diff "$PR_NUMBER" --name-only)
-          echo "Changed files:"
-          echo "$CHANGED"
-
-          DENY_REGEX=$(echo "$DENY_PATTERNS" | grep -vE '^$' | paste -sd '|' -)
-
-          if [ -n "$DENY_REGEX" ] && echo "$CHANGED" | grep -E "$DENY_REGEX" >/dev/null; then
-            MATCHED=$(echo "$CHANGED" | grep -E "$DENY_REGEX" | head -3 | tr '\n' ' ' | sed 's/ $//')
-            echo "denied=true" >> "$GITHUB_OUTPUT"
-            echo "reason=critical path への変更があります: $MATCHED" >> "$GITHUB_OUTPUT"
-          else
-            echo "denied=false" >> "$GITHUB_OUTPUT"
-          fi
+      # -----------------------------------------------------------
+      # Add critical path globs here. Any PR touching a matching
+      # file will be marked `needs-human-review` unconditionally.
+      # -----------------------------------------------------------
+      - name: Match against critical path globs
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          list-files: shell
+          filters: |
+            critical:
+              - '.github/workflows/**'
 
   static-allow:
     name: Static allow (trivial paths)
@@ -62,32 +40,39 @@ jobs:
     outputs:
       approved: ${{ steps.check.outputs.approved }}
     steps:
-      - name: Match against ALLOW_PATTERNS
+      # -----------------------------------------------------------
+      # Add trivial path globs to the `trivial` filter below. A PR
+      # whose changed files are all covered by `trivial` is marked
+      # `skip-human-review` without calling Claude.
+      # The `all` filter is a catch-all used for the subset check.
+      # -----------------------------------------------------------
+      - name: Match against trivial path globs
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          list-files: json
+          filters: |
+            all:
+              - '**'
+            trivial:
+              - '**/*.md'
+              - 'public/**'
+              - '.gitignore'
+
+      - name: Subset check (all files in trivial list?)
         id: check
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          ALL_JSON: ${{ steps.filter.outputs.all_files }}
+          TRIVIAL_JSON: ${{ steps.filter.outputs.trivial_files }}
         run: |
-          CHANGED=$(gh pr diff "$PR_NUMBER" --name-only)
-          echo "Changed files:"
-          echo "$CHANGED"
+          ALL_COUNT=$(jq 'length' <<< "$ALL_JSON")
+          TRIVIAL_COUNT=$(jq 'length' <<< "$TRIVIAL_JSON")
+          echo "changed files: $ALL_COUNT, trivial matches: $TRIVIAL_COUNT"
 
-          ALLOW_REGEX=$(echo "$ALLOW_PATTERNS" | grep -vE '^$' | paste -sd '|' -)
-
-          if [ -z "$CHANGED" ] || [ -z "$ALLOW_REGEX" ]; then
-            echo "approved=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          UNSAFE=$(echo "$CHANGED" | grep -vE "$ALLOW_REGEX" || true)
-
-          if [ -z "$UNSAFE" ]; then
+          if [ "$ALL_COUNT" -gt 0 ] && [ "$ALL_COUNT" = "$TRIVIAL_COUNT" ]; then
             echo "approved=true" >> "$GITHUB_OUTPUT"
           else
             echo "approved=false" >> "$GITHUB_OUTPUT"
-            echo "Files outside whitelist:"
-            echo "$UNSAFE"
           fi
 
   dynamic-judge:
@@ -163,7 +148,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           DENY_DENIED: ${{ needs.static-deny.outputs.denied }}
-          DENY_REASON: ${{ needs.static-deny.outputs.reason }}
+          DENY_MATCHED: ${{ needs.static-deny.outputs.matched }}
           ALLOW_APPROVED: ${{ needs.static-allow.outputs.approved }}
           DYNAMIC_NEEDS_REVIEW: ${{ needs.dynamic-judge.outputs.needs_review }}
           DYNAMIC_IMPACT: ${{ needs.dynamic-judge.outputs.impact }}

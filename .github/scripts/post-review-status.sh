@@ -13,7 +13,7 @@
 #   DENY_DENIED            — 'true' | 'false' (from static-deny.outputs.denied)
 #   ALLOW_APPROVED         — 'true' | 'false' (from static-allow.outputs.approved)
 # Optional env (dynamic branch):
-#   DENY_REASON            — text shown when DENY_DENIED=true
+#   DENY_MATCHED           — space-separated files matched by critical globs
 #   DYNAMIC_NEEDS_REVIEW   — 'true' | 'false' (from Claude)
 #   DYNAMIC_IMPACT         — 'low' | 'medium' | 'high'
 #   DYNAMIC_REASON         — free-text reason from Claude
@@ -36,7 +36,11 @@ gh label create skip-human-review  --color 0E8A16 --description "人間レビュ
 if [ "$DENY_DENIED" = "true" ]; then
   NEEDS_REVIEW=true
   SOURCE="🔒 Static deny (critical paths)"
-  REASON="${DENY_REASON:-critical path への変更があります}"
+  if [ -n "${DENY_MATCHED:-}" ]; then
+    REASON="critical path への変更があります: ${DENY_MATCHED}"
+  else
+    REASON="critical path への変更があります"
+  fi
   IMPACT=""
 elif [ "$ALLOW_APPROVED" = "true" ]; then
   NEEDS_REVIEW=false
