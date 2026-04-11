@@ -19,18 +19,14 @@ jobs:
       denied: ${{ steps.check.outputs.denied }}
       reason: ${{ steps.check.outputs.reason }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Detect changed files and match critical paths
         id: check
         env:
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          git fetch origin "$BASE_REF" --depth=1
-          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          CHANGED=$(gh pr diff "$PR_NUMBER" --name-only)
           echo "Changed files:"
           echo "$CHANGED"
 
@@ -49,18 +45,14 @@ jobs:
     outputs:
       approved: ${{ steps.check.outputs.approved }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Detect changed files and match trivial whitelist
         id: check
         env:
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          git fetch origin "$BASE_REF" --depth=1
-          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          CHANGED=$(gh pr diff "$PR_NUMBER" --name-only)
           echo "Changed files:"
           echo "$CHANGED"
 
