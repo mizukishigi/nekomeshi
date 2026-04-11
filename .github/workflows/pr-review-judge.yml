@@ -12,11 +12,31 @@ permissions:
 
 jobs:
   preflight:
-    name: Preflight (skip draft PRs)
+    name: Preflight (skip draft, detect changed files)
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    outputs:
+      changed_files: ${{ steps.detect.outputs.files }}
     steps:
-      - run: echo "PR is not draft. Proceeding to judgment."
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed files
+        id: detect
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          git fetch origin "$BASE_REF" --depth=1
+          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          echo "Changed files:"
+          echo "$CHANGED"
+          {
+            echo "files<<CHANGED_FILES_EOF"
+            echo "$CHANGED"
+            echo "CHANGED_FILES_EOF"
+          } >> "$GITHUB_OUTPUT"
 
   static-deny:
     name: Static deny (critical paths)
@@ -26,21 +46,11 @@ jobs:
       denied: ${{ steps.check.outputs.denied }}
       reason: ${{ steps.check.outputs.reason }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Detect changed files
+      - name: Check against critical paths
         id: check
         env:
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          CHANGED: ${{ needs.preflight.outputs.changed_files }}
         run: |
-          git fetch origin "$BASE_REF" --depth=1
-          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
-          echo "Changed files:"
-          echo "$CHANGED"
-
           if echo "$CHANGED" | grep -E '^\.github/workflows/' >/dev/null; then
             echo "denied=true" >> "$GITHUB_OUTPUT"
             echo "reason=ワークフローファイル (.github/workflows/**) の変更は必ず人間レビューが必要です" >> "$GITHUB_OUTPUT"
@@ -50,27 +60,17 @@ jobs:
 
   static-allow:
     name: Static allow (trivial paths)
-    needs: static-deny
+    needs: [preflight, static-deny]
     if: needs.static-deny.outputs.denied == 'false'
     runs-on: ubuntu-latest
     outputs:
       approved: ${{ steps.check.outputs.approved }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Detect changed files
+      - name: Check against trivial whitelist
         id: check
         env:
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          CHANGED: ${{ needs.preflight.outputs.changed_files }}
         run: |
-          git fetch origin "$BASE_REF" --depth=1
-          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
-          echo "Changed files:"
-          echo "$CHANGED"
-
           # Whitelist: **/*.md, public/**, .gitignore
           UNSAFE=$(echo "$CHANGED" | grep -vE '(^|/)[^/]+\.md$|^public/|^\.gitignore$' || true)
 
