@@ -23,8 +23,12 @@ set -euo pipefail
 : "${GH_TOKEN:?}"
 : "${PR_NUMBER:?}"
 : "${HEAD_SHA:?}"
-: "${DENY_DENIED:?}"
-: "${ALLOW_APPROVED:?}"
+
+# DENY_DENIED / ALLOW_APPROVED / DYNAMIC_NEEDS_REVIEW come from upstream job
+# outputs. Any job that was skipped returns an empty string, so we default
+# them to "false" instead of failing on unset.
+: "${DENY_DENIED:=false}"
+: "${ALLOW_APPROVED:=false}"
 
 SHORT_SHA="${HEAD_SHA:0:7}"
 
@@ -48,7 +52,11 @@ elif [ "$ALLOW_APPROVED" = "true" ]; then
   REASON="全変更ファイルが trivial path whitelist に収まっています"
   IMPACT=""
 else
-  NEEDS_REVIEW="${DYNAMIC_NEEDS_REVIEW:?}"
+  NEEDS_REVIEW="${DYNAMIC_NEEDS_REVIEW:-}"
+  if [ -z "$NEEDS_REVIEW" ]; then
+    echo "No winning gate produced a decision" >&2
+    exit 1
+  fi
   SOURCE="🤖 Dynamic judge (Claude)"
   REASON="${DYNAMIC_REASON:-}"
   IMPACT="${DYNAMIC_IMPACT:-}"
