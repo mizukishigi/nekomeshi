@@ -36,50 +36,10 @@ jobs:
 
           if echo "$CHANGED" | grep -E '^\.github/workflows/' >/dev/null; then
             echo "denied=true" >> "$GITHUB_OUTPUT"
-            echo "reason=ワークフローファイル (.github/workflows/**) の変更は必ず人間レビューが必要です。" >> "$GITHUB_OUTPUT"
+            echo "reason=ワークフローファイル (.github/workflows/**) の変更は必ず人間レビューが必要です" >> "$GITHUB_OUTPUT"
           else
             echo "denied=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Ensure labels exist
-        if: steps.check.outputs.denied == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh label create needs-human-review --color B60205 --description "人間レビュー必須" 2>/dev/null || true
-          gh label create skip-human-review --color 0E8A16 --description "人間レビュー不要" 2>/dev/null || true
-
-      - name: Dedup, label, comment
-        if: steps.check.outputs.denied == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          REPO: ${{ github.repository }}
-          REASON: ${{ steps.check.outputs.reason }}
-        run: |
-          SHORT_SHA="${HEAD_SHA:0:7}"
-
-          # Delete existing judge comments (marker-based dedup)
-          gh api "repos/$REPO/issues/$PR_NUMBER/comments" \
-            --jq '.[] | select(.body | contains("<!-- pr-review-judge -->")) | .id' \
-            | while read -r id; do
-                [ -n "$id" ] && gh api -X DELETE "repos/$REPO/issues/comments/$id"
-              done
-
-          # Swap labels
-          gh pr edit "$PR_NUMBER" --remove-label skip-human-review 2>/dev/null || true
-          gh pr edit "$PR_NUMBER" --add-label needs-human-review
-
-          # Post new comment
-          gh pr comment "$PR_NUMBER" --body "$(cat <<EOF
-          <!-- pr-review-judge -->
-          🔒 **Static deny (critical paths)**
-          - Commit: \`$SHORT_SHA\`
-          - 判定: needs-human-review
-          - 理由: $REASON
-          EOF
-          )"
 
   static-allow:
     name: Static allow (trivial paths)
@@ -104,7 +64,7 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED"
 
-          # Whitelist: *.md, public/**, .gitignore
+          # Whitelist: **/*.md, public/**, .gitignore
           UNSAFE=$(echo "$CHANGED" | grep -vE '(^|/)[^/]+\.md$|^public/|^\.gitignore$' || true)
 
           if [ -z "$CHANGED" ]; then
@@ -117,42 +77,6 @@ jobs:
             echo "$UNSAFE"
           fi
 
-      - name: Ensure labels exist
-        if: steps.check.outputs.approved == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh label create needs-human-review --color B60205 --description "人間レビュー必須" 2>/dev/null || true
-          gh label create skip-human-review --color 0E8A16 --description "人間レビュー不要" 2>/dev/null || true
-
-      - name: Dedup, label, comment
-        if: steps.check.outputs.approved == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          REPO: ${{ github.repository }}
-        run: |
-          SHORT_SHA="${HEAD_SHA:0:7}"
-
-          gh api "repos/$REPO/issues/$PR_NUMBER/comments" \
-            --jq '.[] | select(.body | contains("<!-- pr-review-judge -->")) | .id' \
-            | while read -r id; do
-                [ -n "$id" ] && gh api -X DELETE "repos/$REPO/issues/comments/$id"
-              done
-
-          gh pr edit "$PR_NUMBER" --remove-label needs-human-review 2>/dev/null || true
-          gh pr edit "$PR_NUMBER" --add-label skip-human-review
-
-          gh pr comment "$PR_NUMBER" --body "$(cat <<EOF
-          <!-- pr-review-judge -->
-          ✅ **Static allow (trivial paths)**
-          - Commit: \`$SHORT_SHA\`
-          - 判定: skip-human-review
-          - 理由: 全変更ファイルが whitelist (\`**/*.md\`, \`public/**\`, \`.gitignore\`) 内に収まっています。
-          EOF
-          )"
-
   dynamic-judge:
     name: Dynamic judge (Claude)
     needs: [static-deny, static-allow]
@@ -160,53 +84,89 @@ jobs:
       needs.static-deny.outputs.denied == 'false' &&
       needs.static-allow.outputs.approved == 'false'
     runs-on: ubuntu-latest
+    outputs:
+      verdict: ${{ steps.read.outputs.verdict }}
+      impact: ${{ steps.read.outputs.impact }}
+      reason: ${{ steps.read.outputs.reason }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Ensure labels exist
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh label create needs-human-review --color B60205 --description "人間レビュー必須" 2>/dev/null || true
-          gh label create skip-human-review --color 0E8A16 --description "人間レビュー不要" 2>/dev/null || true
-
       - name: Run Claude review judge
         uses: anthropics/claude-code-action@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          REPO: ${{ github.repository }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
-            あなたは nekomeshi リポジトリの PR レビュー判定ボットです。以下の手順で作業してください。
+            あなたは nekomeshi リポジトリの PR レビュー判定ボットです。
+            ラベル操作・コメント投稿は後続の job が行うので、あなたは判定結果を JSON ファイルに書き出すだけで終了してください。
 
+            手順:
             1. `.github/pr-review-criteria.md` を Read ツールで読み込み、判定基準を把握する
             2. `gh pr diff $PR_NUMBER` を実行して PR の変更内容を取得する
             3. 基準に沿って影響レベル (low / medium / high) と判定 (skip-human-review / needs-human-review) を決める
-            4. 既存の判定コメントを削除する (PR に残すのは常に最新の 1 件だけにしたい):
-               - 既存コメント ID を取得: `gh api "repos/$REPO/issues/$PR_NUMBER/comments" --jq '.[] | select(.body | contains("<!-- pr-review-judge -->")) | .id'`
-               - ヒットした各 ID に対して削除: `gh api -X DELETE "repos/$REPO/issues/comments/<id>"`
-               - 既存コメントが無ければスキップして良い
-            5. ラベルを更新する (反対側ラベルを外してから新ラベルを付与):
-               - skip-human-review の場合: `gh pr edit $PR_NUMBER --remove-label needs-human-review --add-label skip-human-review`
-               - needs-human-review の場合: `gh pr edit $PR_NUMBER --remove-label skip-human-review --add-label needs-human-review`
-               - `--remove-label` は対象ラベルが PR に付いていなければエラーになるので、その場合はエラーを無視して `--add-label` のみを再実行してよい
-            6. 新しい判定コメントを投稿する。必ず先頭行に HTML マーカー `<!-- pr-review-judge -->` を入れ、本文に commit の先頭 7 文字の SHA を含めること。短縮 SHA は `$HEAD_SHA` の先頭 7 文字を使う。
+            4. 判定結果を Write ツールで `/tmp/claude-verdict.json` に以下の形式で書き出す:
 
-            コメント本文フォーマット (この通りに投稿):
-            ```
-            <!-- pr-review-judge -->
-            🤖 **Dynamic judge (Claude)**
-            - Commit: `<short-sha>`
-            - 影響レベル: <low|medium|high>
-            - 判定: <skip-human-review|needs-human-review>
-            - 理由: <2-3行で簡潔に>
+            ```json
+            {
+              "impact": "low",
+              "verdict": "skip-human-review",
+              "reason": "ここに理由を改行なしの日本語 1 行で"
+            }
             ```
 
-            判断に迷った場合は必ず needs-human-review を選んでください。
-          claude_args: '--model claude-haiku-4-5 --allowed-tools "Read,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr edit:*),Bash(gh pr comment:*),Bash(gh api:*)"'
+            制約:
+            - `reason` には改行を含めない (1 行の日本語で簡潔に)
+            - 判断に迷ったら必ず `needs-human-review` を選ぶ
+            - ラベル付与・コメント投稿・gh api は一切呼び出さない (後続 job の責務)
+          claude_args: '--model claude-haiku-4-5 --allowed-tools "Read,Write,Bash(gh pr diff:*)"'
+
+      - name: Read verdict
+        id: read
+        run: |
+          if [ ! -f /tmp/claude-verdict.json ]; then
+            echo "Claude did not produce /tmp/claude-verdict.json" >&2
+            exit 1
+          fi
+
+          cat /tmp/claude-verdict.json
+
+          VERDICT=$(jq -r .verdict /tmp/claude-verdict.json)
+          IMPACT=$(jq -r .impact /tmp/claude-verdict.json)
+          REASON=$(jq -r .reason /tmp/claude-verdict.json)
+
+          echo "verdict=$VERDICT" >> "$GITHUB_OUTPUT"
+          echo "impact=$IMPACT" >> "$GITHUB_OUTPUT"
+          echo "reason=$REASON" >> "$GITHUB_OUTPUT"
+
+  apply-result:
+    name: Apply judgment to PR
+    needs: [static-deny, static-allow, dynamic-judge]
+    if: >
+      always() &&
+      (needs.static-deny.outputs.denied == 'true' ||
+       needs.static-allow.outputs.approved == 'true' ||
+       needs.dynamic-judge.outputs.verdict != '')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (for scripts)
+        uses: actions/checkout@v4
+
+      - name: Apply judgment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          DENY_DENIED: ${{ needs.static-deny.outputs.denied }}
+          DENY_REASON: ${{ needs.static-deny.outputs.reason }}
+          ALLOW_APPROVED: ${{ needs.static-allow.outputs.approved }}
+          DYNAMIC_VERDICT: ${{ needs.dynamic-judge.outputs.verdict }}
+          DYNAMIC_IMPACT: ${{ needs.dynamic-judge.outputs.impact }}
+          DYNAMIC_REASON: ${{ needs.dynamic-judge.outputs.reason }}
+        run: |
+          chmod +x .github/scripts/apply-judgment.sh
+          .github/scripts/apply-judgment.sh
