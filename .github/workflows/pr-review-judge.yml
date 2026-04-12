@@ -106,6 +106,8 @@ jobs:
           {
             echo "content<<PROMPT_EOF"
             cat .github/pr-review/dynamic-judge.md
+            echo ""
+            echo "対象PR番号: ${{ github.event.pull_request.number }}"
             echo "PROMPT_EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -114,7 +116,6 @@ jobs:
         uses: anthropics/claude-code-action@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: ${{ steps.load_prompt.outputs.content }}

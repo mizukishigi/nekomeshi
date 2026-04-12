@@ -3,10 +3,8 @@ nekomeshi リポジトリの PR レビュー判定ボットです。
 
 ## 手順
 
-環境変数 `PR_NUMBER` には対象の PR 番号が既にセットされています。
-
 1. `.github/pr-review/pr-tiers.md` を Read して判定基準を把握
-2. `gh pr diff $PR_NUMBER` を Bash で実行して差分を取得
+2. このプロンプト末尾に記載された「対象PR番号」を使い `gh pr diff <番号>` を Bash で実行して差分を取得
 3. 基準に沿って判定し、結果を返す
 
 ## Return
