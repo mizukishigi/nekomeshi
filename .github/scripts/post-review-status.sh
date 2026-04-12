@@ -39,49 +39,49 @@ gh label create skip-human-review  --color 0E8A16 --description "人間レビュ
 # Pick the winning gate in priority order.
 if [ "$DENY_DENIED" = "true" ]; then
   NEEDS_REVIEW=true
-  SOURCE="🔒 Static deny (critical paths)"
+  SOURCE="静的ファイルパス判定 (critical)"
   if [ -n "${DENY_MATCHED:-}" ]; then
     REASON="critical path への変更があります: ${DENY_MATCHED}"
   else
     REASON="critical path への変更があります"
   fi
-  IMPACT=""
 elif [ "$ALLOW_APPROVED" = "true" ]; then
   NEEDS_REVIEW=false
-  SOURCE="✅ Static allow (trivial paths)"
+  SOURCE="静的ファイルパス判定 (trivial)"
   REASON="全変更ファイルが trivial path whitelist に収まっています"
-  IMPACT=""
 else
   NEEDS_REVIEW="${DYNAMIC_NEEDS_REVIEW:-}"
   if [ -z "$NEEDS_REVIEW" ]; then
     echo "No winning gate produced a decision" >&2
     exit 1
   fi
-  SOURCE="🤖 Dynamic judge (Claude)"
+  IMPACT="${DYNAMIC_IMPACT:-unknown}"
+  SOURCE="Claude判定 (影響レベル: $IMPACT)"
   REASON="${DYNAMIC_REASON:-}"
-  IMPACT="${DYNAMIC_IMPACT:-}"
 fi
 
 echo "Winner: $SOURCE / needs_review=$NEEDS_REVIEW"
 
-# Swap labels: remove the opposite, add the winner.
+# Swap labels and pick the header message.
 if [ "$NEEDS_REVIEW" = "true" ]; then
   gh pr edit "$PR_NUMBER" --remove-label skip-human-review 2>/dev/null || true
   gh pr edit "$PR_NUMBER" --add-label needs-human-review
-  LABEL="needs-human-review"
+  HEADER="⚠️ **このPRは人間レビューが必要です**"
 else
   gh pr edit "$PR_NUMBER" --remove-label needs-human-review 2>/dev/null || true
   gh pr edit "$PR_NUMBER" --add-label skip-human-review
-  LABEL="skip-human-review"
+  HEADER="✅ **このPRはレビュー不要です**"
 fi
 
-# Build comment body. The HTML marker on line 1 is reserved for future use.
+# Build comment body. The HTML marker on line 1 is reserved for future dedup.
 {
   echo "<!-- pr-review-judge -->"
-  echo "**$SOURCE**"
+  echo "## レビュー要否チェック結果"
+  echo ""
+  echo "$HEADER"
+  echo ""
   echo "- Commit: \`$SHORT_SHA\`"
-  [ -n "$IMPACT" ] && echo "- 影響レベル: $IMPACT"
-  echo "- 人間レビュー: \`$LABEL\`"
+  echo "- 判定: $SOURCE"
   echo "- 理由: $REASON"
 } > /tmp/pr-review-comment.md
 
