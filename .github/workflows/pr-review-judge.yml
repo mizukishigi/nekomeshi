@@ -90,10 +90,10 @@ jobs:
       needs.static-allow.outputs.approved == 'false'
     runs-on: ubuntu-latest
     outputs:
-      needs_review: ${{ steps.read.outputs.needs_review }}
-      impact: ${{ steps.read.outputs.impact }}
-      reason: ${{ steps.read.outputs.reason }}
-      details: ${{ steps.read.outputs.details }}
+      needs_review: ${{ fromJSON(steps.claude.outputs.structured_output).needs_review }}
+      impact: ${{ fromJSON(steps.claude.outputs.structured_output).impact }}
+      reason: ${{ fromJSON(steps.claude.outputs.structured_output).reason }}
+      details: ${{ fromJSON(steps.claude.outputs.structured_output).details }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -110,6 +110,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Run Claude review judge
+        id: claude
         uses: anthropics/claude-code-action@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -117,40 +118,10 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: ${{ steps.load_prompt.outputs.content }}
-          claude_args: '--model claude-haiku-4-5 --allowed-tools "Read,Write,Bash(gh pr diff:*)"'
-
-      - name: Read Claude result
-        id: read
-        run: |
-          if [ ! -f /tmp/pr-review-result.json ]; then
-            # Defensive fallback: Claude occasionally skips tool use and
-            # replies with text only. In that case, default to the safe
-            # side (needs_review=true) so a human still looks at the PR.
-            echo "Claude did not produce /tmp/pr-review-result.json; defaulting to needs_review=true" >&2
-            {
-              echo "needs_review=true"
-              echo "impact=unknown"
-              echo "reason=Claude が判定結果を出力しなかったため、安全側で人間レビュー必須と判定"
-            } >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          cat /tmp/pr-review-result.json
-
-          NEEDS_REVIEW=$(jq -r .needs_review /tmp/pr-review-result.json)
-          IMPACT=$(jq -r .impact /tmp/pr-review-result.json)
-          REASON=$(jq -r .reason /tmp/pr-review-result.json)
-
-          DETAILS=$(jq -r '.details // ""' /tmp/pr-review-result.json)
-
-          echo "needs_review=$NEEDS_REVIEW" >> "$GITHUB_OUTPUT"
-          echo "impact=$IMPACT" >> "$GITHUB_OUTPUT"
-          echo "reason=$REASON" >> "$GITHUB_OUTPUT"
-          {
-            echo "details<<DETAILS_EOF"
-            echo "$DETAILS"
-            echo "DETAILS_EOF"
-          } >> "$GITHUB_OUTPUT"
+          claude_args: >-
+            --model claude-haiku-4-5
+            --allowed-tools "Read,Bash(gh pr diff:*)"
+            --json-schema '{"type":"object","properties":{"impact":{"type":"string","enum":["low","medium","high"]},"needs_review":{"type":"boolean"},"reason":{"type":"string"},"details":{"type":"string"}},"required":["impact","needs_review","reason","details"]}'
 
   post-review-status:
     name: Post review status to PR
