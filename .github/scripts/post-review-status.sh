@@ -74,6 +74,8 @@ else
 fi
 
 # Build comment body. The HTML marker on line 1 is reserved for future dedup.
+DETAILS="${DYNAMIC_DETAILS:-}"
+
 {
   echo "<!-- pr-review-judge -->"
   echo "## レビュー要否チェック結果"
@@ -83,6 +85,15 @@ fi
   echo "- Commit: \`$SHORT_SHA\`"
   echo "- 判定: $SOURCE"
   echo "- 理由: $REASON"
+  if [ -n "$DETAILS" ]; then
+    echo ""
+    echo "<details>"
+    echo "<summary>判定の詳細 (Claude分析)</summary>"
+    echo ""
+    echo "$DETAILS"
+    echo ""
+    echo "</details>"
+  fi
 } > /tmp/pr-review-comment.md
 
 cat /tmp/pr-review-comment.md

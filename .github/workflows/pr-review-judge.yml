@@ -93,6 +93,7 @@ jobs:
       needs_review: ${{ steps.read.outputs.needs_review }}
       impact: ${{ steps.read.outputs.impact }}
       reason: ${{ steps.read.outputs.reason }}
+      details: ${{ steps.read.outputs.details }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -140,9 +141,16 @@ jobs:
           IMPACT=$(jq -r .impact /tmp/pr-review-result.json)
           REASON=$(jq -r .reason /tmp/pr-review-result.json)
 
+          DETAILS=$(jq -r '.details // ""' /tmp/pr-review-result.json)
+
           echo "needs_review=$NEEDS_REVIEW" >> "$GITHUB_OUTPUT"
           echo "impact=$IMPACT" >> "$GITHUB_OUTPUT"
           echo "reason=$REASON" >> "$GITHUB_OUTPUT"
+          {
+            echo "details<<DETAILS_EOF"
+            echo "$DETAILS"
+            echo "DETAILS_EOF"
+          } >> "$GITHUB_OUTPUT"
 
   post-review-status:
     name: Post review status to PR
@@ -168,6 +176,7 @@ jobs:
           DYNAMIC_NEEDS_REVIEW: ${{ needs.dynamic-judge.outputs.needs_review }}
           DYNAMIC_IMPACT: ${{ needs.dynamic-judge.outputs.impact }}
           DYNAMIC_REASON: ${{ needs.dynamic-judge.outputs.reason }}
+          DYNAMIC_DETAILS: ${{ needs.dynamic-judge.outputs.details }}
         run: |
           chmod +x .github/scripts/post-review-status.sh
           .github/scripts/post-review-status.sh
