@@ -105,7 +105,7 @@ jobs:
         run: |
           {
             echo "content<<PROMPT_EOF"
-            cat .github/pr-review/dynamic-judge.md
+            cat .github/pr-review-judge/dynamic-judge.md
             echo "PROMPT_EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -151,5 +151,5 @@ jobs:
           DYNAMIC_REASON: ${{ needs.dynamic-judge.outputs.reason }}
           DYNAMIC_DETAILS: ${{ needs.dynamic-judge.outputs.details }}
         run: |
-          chmod +x .github/scripts/post-review-status.sh
-          .github/scripts/post-review-status.sh
+          chmod +x .github/pr-review-judge/post-review-status.sh
+          .github/pr-review-judge/post-review-status.sh
