@@ -121,7 +121,7 @@ jobs:
           claude_args: >-
             --model claude-haiku-4-5
             --allowed-tools "Read,Bash(gh pr diff:*)"
-            --json-schema '{"type":"object","properties":{"impact":{"type":"string","enum":["low","medium","high"]},"needs_review":{"type":"boolean"},"reason":{"type":"string"},"details":{"type":"string"}},"required":["impact","needs_review","reason","details"]}'
+            --json-schema '{"type":"object","properties":{"impact":{"type":"string","enum":["low","medium","high"],"description":"影響レベル"},"needs_review":{"type":"boolean","description":"人間レビューの要否。迷ったらtrue"},"reason":{"type":"string","description":"判定理由を1行の日本語で"},"details":{"type":"string","description":"変更ファイル一覧・適用基準・判定プロセスをMarkdownで"}},"required":["impact","needs_review","reason","details"]}'
 
   post-review-status:
     name: Post review status to PR
