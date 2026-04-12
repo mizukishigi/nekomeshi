@@ -1,4 +1,4 @@
-export const AMOUNT_PRESETS = [30, 50, 80] as const
+export const AMOUNT_PRESETS = [25, 50, 80] as const
 
 export const APPETITE_LABELS = [
   '全く食べない',

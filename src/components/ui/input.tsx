@@ -24,7 +24,7 @@ export function Input({ className, label, error, id, ref, ...props }: InputProps
           'w-full rounded-xl border border-text-muted/30 bg-surface px-4 py-2.5',
           'text-text placeholder:text-text-muted/50',
           'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
-          'transition-colors',
+          'transition-colors duration-200',
           error && 'border-error focus:border-error focus:ring-error/20',
           className
         )}

@@ -20,7 +20,7 @@ export function formatDateTime(date: Date | string): string {
 }
 
 export function formatWeight(kg: number): string {
-  return `${kg.toFixed(1)}kg`
+  return `${kg.toFixed(1)} kg`
 }
 
 export function cn(...classes: (string | undefined | null | false)[]): string {
