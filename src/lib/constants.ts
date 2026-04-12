@@ -5,7 +5,7 @@ export const APPETITE_LABELS = [
   '少し食べた',
   'まあまあ',
   'よく食べた',
-  '完食！',
+  '完食!',
 ] as const
 
 export const STOOL_LABELS = [
