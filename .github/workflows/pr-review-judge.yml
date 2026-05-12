@@ -37,7 +37,10 @@ jobs:
           list-files: shell
           filters: |
             critical:
-              - '.github/workflows/**'
+              # 必要になったらここに critical path を追加する。
+              # 空リストだと paths-filter がエラーになるので、絶対にマッチしない
+              # ダミーパスを置いている。
+              - '__placeholder_never_matches__'
 
   static-allow:
     name: Static allow (trivial paths)
