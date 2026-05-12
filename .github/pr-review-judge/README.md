@@ -40,7 +40,7 @@ flowchart TD
 
 | ゲート | 現在のパターン |
 |---|---|
-| Critical (deny) | `.github/workflows/**` |
+| Critical (deny) | (現在は未設定) |
 | Trivial (allow) | `**/*.md`, `public/**`, `.gitignore` |
 
 ## 判定基準 (pr-tiers.md)
