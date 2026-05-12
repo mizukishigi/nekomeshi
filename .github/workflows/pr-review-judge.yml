@@ -138,9 +138,18 @@ jobs:
       - name: Checkout (for scripts)
         uses: actions/checkout@v4
 
+      - name: Generate App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.REVIEW_BOT_APP_ID }}
+          private-key: ${{ secrets.REVIEW_BOT_PRIVATE_KEY }}
+
       - name: Post review status
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+          REVIEWER: MizukiShigi
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           DENY_DENIED: ${{ needs.static-deny.outputs.denied }}
