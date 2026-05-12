@@ -115,8 +115,9 @@ PR_AUTHOR=$(gh pr view "$PR_NUMBER" --json author -q .author.login)
 echo "PR author: $PR_AUTHOR / reviewer: $REVIEWER"
 
 if [ "$NEEDS_REVIEW" = "false" ]; then
-  APPROVE_BODY=$(printf '%s\n\n- 判定: %s\n- 理由: %s\n' "$HEADER" "$SOURCE" "$REASON")
-  GH_TOKEN="$APP_TOKEN" gh pr review "$PR_NUMBER" --approve --body "$APPROVE_BODY"
+  # 判定の詳細は github-actions[bot] のコメントに出ているので、approve 自体は
+  # body なしで済ませる (レビュー欄に重複コメントが出ないようにする)。
+  GH_TOKEN="$APP_TOKEN" gh pr review "$PR_NUMBER" --approve
 else
   if [ "$PR_AUTHOR" = "$REVIEWER" ]; then
     echo "Skip add-reviewer: PR author ($PR_AUTHOR) cannot review own PR"
