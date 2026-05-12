@@ -23,6 +23,8 @@ set -euo pipefail
 : "${GH_TOKEN:?}"
 : "${PR_NUMBER:?}"
 : "${HEAD_SHA:?}"
+: "${APP_TOKEN:?}"
+: "${REVIEWER:?}"
 
 # DENY_DENIED / ALLOW_APPROVED / DYNAMIC_NEEDS_REVIEW come from upstream job
 # outputs. Any job that was skipped returns an empty string, so we default
@@ -99,3 +101,26 @@ DETAILS="${DYNAMIC_DETAILS:-}"
 cat /tmp/pr-review-comment.md
 
 gh pr comment "$PR_NUMBER" --body-file /tmp/pr-review-comment.md
+
+# ----------------------------------------------------------------------
+# Approve / request review.
+#
+# - needs_review=false → GitHub App でこのPRを自動approve
+#   (branch protection の required reviews にカウントさせるため、
+#    GITHUB_TOKEN ではなく App token を使う)
+# - needs_review=true  → REVIEWER をレビュワーに追加
+#   ただし PR author == REVIEWER の場合は GitHub が弾くのでスキップ
+# ----------------------------------------------------------------------
+PR_AUTHOR=$(gh pr view "$PR_NUMBER" --json author -q .author.login)
+echo "PR author: $PR_AUTHOR / reviewer: $REVIEWER"
+
+if [ "$NEEDS_REVIEW" = "false" ]; then
+  APPROVE_BODY=$(printf '%s\n\n- 判定: %s\n- 理由: %s\n' "$HEADER" "$SOURCE" "$REASON")
+  GH_TOKEN="$APP_TOKEN" gh pr review "$PR_NUMBER" --approve --body "$APPROVE_BODY"
+else
+  if [ "$PR_AUTHOR" = "$REVIEWER" ]; then
+    echo "Skip add-reviewer: PR author ($PR_AUTHOR) cannot review own PR"
+  else
+    gh pr edit "$PR_NUMBER" --add-reviewer "$REVIEWER"
+  fi
+fi
